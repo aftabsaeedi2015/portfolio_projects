@@ -180,8 +180,8 @@ function ItemDescription({navigation}) {
           showsHorizontalScrollIndicator = {false}
           >
             <View style = {styles.similarItemsContainer}>
-            {similarAds.map(similarAd=>{
-              return similarAd.adId!=item.adId? <ListCompactItem item = {similarAd} navigation = {navigation} /> : null
+            {similarAds.map((similarAd,index)=>{
+              return similarAd.adId!=item.adId? <ListCompactItem key={index} item = {similarAd} navigation = {navigation} /> : null
             })}
             </View>
           </ScrollView>

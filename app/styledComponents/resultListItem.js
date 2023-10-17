@@ -1,11 +1,13 @@
 import React , { useEffect, useState } from 'react'
-import {Card, Text,Snackbar} from 'react-native-paper'
+import {Card, Text,Snackbar, ThemeProvider,useTheme} from 'react-native-paper'
 import { View,StyleSheet, Image, TouchableOpacity} from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome'
-import { addToFavorites, getCoverImage,existsInFavorites } from '../screens/data/dbOperations'
+import { addToFavorites, getCoverImage,existsInFavorites,removeFromFavorites } from '../screens/data/dbOperations'
 import {useSelector,useDispatch} from 'react-redux'
 
-function ResultListItem({navigation,item,itemSelectionHandler,handleSnackbar}) {
+function ResultListItem({navigation,key,item,itemSelectionHandler,handleSnackbar,}) {
+  console.log(item)
+  const theme = useTheme()
     const styles = StyleSheet.create({
         parentContainer : {
           display: 'flex',
@@ -44,6 +46,12 @@ function ResultListItem({navigation,item,itemSelectionHandler,handleSnackbar}) {
         },
         heart:{
           color: heartColor
+        },
+        blackIcon: {
+          color: 'black'
+        },
+        blueIcon: {
+          color: theme.colors.background
         }
 
       })
@@ -51,10 +59,20 @@ function ResultListItem({navigation,item,itemSelectionHandler,handleSnackbar}) {
     const userId = user.userId
     const [heartColor,setHeartColor] = useState('')
     const [downloadUrl,setDownloadUrl] = useState(null)
+    const [adExistsInFavorites,setAdExistsInFavorites] = useState(false)
     const addToFavoriteHandler = async () => {
       try {
-        const response = await addToFavorites(userId, item.adId);
-        handleSnackbar(response);
+        if (adExistsInFavorites) {
+          // If the item is already in favorites, remove it
+          const response = await removeFromFavorites(userId, item.adId); // You need to create this function
+          handleSnackbar(response);
+          setAdExistsInFavorites(false);
+        } else {
+          // If the item is not in favorites, add it
+          const response = await addToFavorites(userId, item.adId);
+          handleSnackbar(response);
+          setAdExistsInFavorites(true);
+        }
       } catch (err) {
         console.log(err);
       }
@@ -78,7 +96,7 @@ function ResultListItem({navigation,item,itemSelectionHandler,handleSnackbar}) {
     }, []);
 
   return (
-    <View style = {styles.parentContainer}>
+    <View style = {styles.parentContainer} key = {key}>
           <TouchableOpacity onPress={()=>{itemSelectionHandler(item)}}>
             <Image source={{uri: downloadUrl}} style = {styles.image}/>
           </TouchableOpacity>
@@ -98,7 +116,7 @@ function ResultListItem({navigation,item,itemSelectionHandler,handleSnackbar}) {
                 {item.adData.location}
                 </Text>
               </View>
-              <Icon name={'heart'} size={20} style={styles.heart} onPress={()=>{addToFavoriteHandler()}}/>
+              <Icon name="heart" size={20} style={adExistsInFavorites ? styles.blueIcon : styles.blackIcon } onPress={()=>addToFavoriteHandler()}/>
             </View>
           </View>
         </View>

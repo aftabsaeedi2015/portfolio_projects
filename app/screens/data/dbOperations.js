@@ -123,19 +123,19 @@ const getAllAds = async () => {
   };
 
 // Function to get an ad using the adId
-const getAd = (adId) => {
+const getAd = async (adId) => {
+  try {
     const db = getDatabase(app);
     const adRef = ref(db, `ads/${adId}`);
 
-    get(adRef)
-      .then((adSnapshot) => {
-          const adData = adSnapshot.val();
-          console.log(adData)
-      })
-      .catch((error) => {
-        console.error('Error getting ad:', error);
-      });
-  };
+    const adSnapshot = await get(adRef);
+    const adData = adSnapshot.val();
+    return adData
+  } catch (err) {
+    throw err
+  }
+};
+
   const getCoverImage = async (adId) => {
     try {
       const storage = getStorage(app);
@@ -143,8 +143,8 @@ const getAd = (adId) => {
       const result = await list(coverImgRef);
       const downloadURL = await getDownloadURL(result.items[0]);
       return downloadURL;
-    } catch (error) {
-      console.log('Error listing or getting download URL:', error);
+    } catch (err) {
+      throw err
     }
   }
   const getAllAdImages = async (adId) => {
@@ -163,6 +163,25 @@ const getAd = (adId) => {
     }
   };
 
+
+
+  const getFavoriteAds = async (userId) => {
+    try {
+      const db = getDatabase(app);
+      const favoriteAdsRef = ref(db, `users/${userId}/favorites/`);
+      const result = await get(favoriteAdsRef);
+      let favoriteAdsIds = result.val() || [];
+      let favoriteAdsArray = []
+      favoriteAdsIds.forEach(async adId=>{
+        let foundAd = await getAd(adId)
+        favoriteAdsArray.push({adId:adId,adData:foundAd})
+      })
+      return favoriteAdsArray
+    } catch (err) {
+      throw err;
+    }
+  }
+
   // Function to add an ad to a user's favorites
   const addToFavorites = async (userId, adId) => {
     const db = getDatabase(app);
@@ -170,13 +189,9 @@ const getAd = (adId) => {
     try {
       const favoritesSnapshot = await get(favoritesRef);
       let favoritesArray = favoritesSnapshot.val() || [];
-      if (!favoritesArray.includes(adId)) {
         favoritesArray.push(adId);
         await set(favoritesRef, favoritesArray);
-        return 'added';
-      } else {
-        return 'exists';
-      }
+        return 'Ad added to favorites';
     } catch (error) {
       console.log('Error in addToFavorites:', error);
       throw error;
@@ -196,33 +211,27 @@ const existsInFavorites = async(userId,adId)=>{
   }
 }
   // Function to remove an ad from a user's favorites
-  const removeFromFavorites = (userId, adId) => {
-    const db = getDatabase(app)
+  const removeFromFavorites = async (userId, adId) => {
+    try {
+      const db = getDatabase(app);
       const favoritesRef = ref(db, `users/${userId}/favorites`);
-
-  // Fetch the current favorites array
-  get(favoritesRef)
-    .then((favoritesSnapshot) => {
+      // Fetch the current favorites array
+      const favoritesSnapshot = await get(favoritesRef);
       let favoritesArray = favoritesSnapshot.val() || [];
-
       if (favoritesArray.includes(adId)) {
         // Remove the adId from the favorites array
         favoritesArray = favoritesArray.filter(favId => favId !== adId);
-        set(favoritesRef, favoritesArray)
-          .then(() => {
-            console.log('Ad removed from favorites.');
-          })
-          .catch((error) => {
-            console.error('Error removing ad from favorites:', error);
-          });
+        await set(favoritesRef, favoritesArray);
+        return 'Ad removed from favorites.'
       } else {
-        console.log('Ad is not in favorites.');
+        return 'Ad is not in favorites'
       }
-    })
-    .catch((error) => {
-      console.error('Error getting favorites:', error);
-    });
-};
+    } catch (error) {
+      // console.error('Error removing ad from favorites:', error);
+      throw error
+    }
+  };
+
 
 const getUserMessages = (userId) => {
     const db = getDatabase(app);
@@ -259,6 +268,7 @@ const getUserMessages = (userId) => {
     removeUserAd,
     getUserAds,
     getAd,
+    getFavoriteAds,
     addToFavorites,
     existsInFavorites,
     removeFromFavorites,

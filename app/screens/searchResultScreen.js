@@ -20,21 +20,8 @@ function SearchResultScreen({search_query,navigation}) {
     navigation.navigate('ItemDescription',{item : item})
   }
   const handleSnackbar=(response)=>{
-    switch(response){
-      case 'added':
-        setSnackbarValue('Ad added to favorites')
+        setSnackbarValue(response)
         setSnackbarVisibility(true)
-
-        break;
-      case 'exists':
-        setSnackbarValue('Ad already exists in favorites')
-        setSnackbarVisibility(true)
-        break;
-      default:
-        setSnackbarValue('There was a problem. please try again later')
-        setSnackbarVisibility(true)
-        break;
-    }
   }
   const styles = StyleSheet.create({
     parentContainer: {
@@ -54,8 +41,9 @@ function SearchResultScreen({search_query,navigation}) {
   })
   return <View style = {styles.parentContainer}>
           <View>
-          {result.map(item=>{
+          {result.map((item,index)=>{
             return <ResultListItem
+            key = {index}
             navigation={navigation}
             item = {item}
             itemSelectionHandler={itemSelectionHandler}

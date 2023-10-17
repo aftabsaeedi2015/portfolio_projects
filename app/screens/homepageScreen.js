@@ -15,21 +15,8 @@ function HomepageScreen({navigation}) {
     const[snackbarVisiblility,setSnackbarVisibility] = useState(false)
     const [snackbarValue,setSnackbarValue] = useState('')
     const handleSnackbar=(response)=>{
-        switch(response){
-          case 'added':
-            setSnackbarValue('Ad added to favorites')
-            setSnackbarVisibility(true)
-
-            break;
-          case 'exists':
-            setSnackbarValue('Ad already exists in favorites')
-            setSnackbarVisibility(true)
-            break;
-          default:
-            setSnackbarValue('There was a problem. please try again later')
-            setSnackbarVisibility(true)
-            break;
-        }
+        setSnackbarValue(response)
+        setSnackbarVisibility(true)
       }
     const handleSearch = ()=>{console.log(searchQuery)}
     const handleCategorySelection = async (category) => {
@@ -117,8 +104,8 @@ function HomepageScreen({navigation}) {
         {<ItemCategoriesBar navigation ={navigation} categoryHandler = {handleCategorySelection}/>}
         <ScrollView contentContainerStyle = {styles.itemContainer}>
             <View style={styles.itemRow}>
-                {ads.map(ad=>{
-                    return <ListCompactItem navigation = {navigation} item = {ad} handleSnackbar={handleSnackbar}/>
+                {ads.map((ad,index)=>{
+                    return <ListCompactItem key = {index} navigation = {navigation} item = {ad} handleSnackbar={handleSnackbar} />
                 })}
             </View>
         </ScrollView>

@@ -41,8 +41,8 @@ function ItemCategoriesBar({navigation,categoryHandler}) {
     ]
   return (
     <View style = {styles.categoriesContainer}>
-        {categories.map(category=>{
-        return <TouchableOpacity onPress = {()=>{categoryHandler(category.name)}}>
+        {categories.map((category,index)=>{
+        return <TouchableOpacity key={index} onPress = {()=>{categoryHandler(category.name)}}>
                     <View style={styles.categoryItem}>
                         <Icon name={category.icon} size={50} style={styles.icon}/>
                         <Text>{category.name}</Text>

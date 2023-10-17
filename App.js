@@ -47,7 +47,7 @@ export default function App() {
           <Stack.Screen name="ItemDescription" component={ItemDescription} />
           {/* <Stack.Screen name="Post" component={PostItem} /> */}
           {/* <Stack.Screen name="Categories" component={CategorieScreen} /> */}
-          {/* <Stack.Screen name="Favorites" component={Favorites} /> */}
+          <Stack.Screen name="Favorites" component={Favorites} />
           {/* <Stack.Screen name="Message" component={receivedMessagesScreen} /> */}
           {/* <Stack.Screen name = "SellerBuyerInteractionScreen" component={SellerBuyerInteractionScreen}/> */}
           {/* <Stack.Screen name="AdPostSuccess" component={SuccessAdPostMessage} /> */}
