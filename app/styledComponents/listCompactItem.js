@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import {StyleSheet} from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {Text,Card,Button,useTheme, ThemeProvider} from 'react-native-paper'
+import {Text,Card,Button,useTheme, ThemeProvider,Snackbar} from 'react-native-paper'
 import { TouchableOpacity } from 'react-native'
 import { existsInFavorites, getCoverImage,addToFavorites,removeFromFavorites } from '../screens/data/dbOperations';
-import {useSelector} from 'react-redux'
+import {useSelector,useDispatch} from 'react-redux'
+
 
 // accepts object in the form of {adId: adId,adData:adData}
-function ListCompactItem({key,navigation,item,handleSnackbar}) {
+function ListCompactItem({key,navigation,item,fetchRefreshedData}) {
     const theme = useTheme()
     const styles = StyleSheet.create({
         item: {
@@ -24,14 +25,32 @@ function ListCompactItem({key,navigation,item,handleSnackbar}) {
         blueIcon: {
             color: theme.colors.background
         },
+        snackbar:{
+          position: 'absolute',
+          backgroundColor: theme.colors.background,
+          top: 120,
+          width: '100%'
+        },
+      snackbarText: {
+      color: 'white'
+      }
     })
+    const dispatch = useDispatch()
     const user = useSelector(state => state.user)
     const userId = user.userId
+    const changeInData = user.changeInData
     const [adData,setAdData] = useState({})
     const [adExistsInFavorites,setAdExistsInFavorites] = useState(false)
     const adId = item.adId
     const [downloadUrl,setDownloadUrl] = useState(null)
+    const[snackbarVisiblility,setSnackbarVisibility] = useState(false)
+    const [snackbarValue,setSnackbarValue] = useState('')
+    const handleSnackbar=(response)=>{
+        setSnackbarValue(response)
+        setSnackbarVisibility(true)
+      }
     const addToFavoriteHandler = async () => {
+        dispatch({type: 'changeInData'})
         try {
           if (adExistsInFavorites) {
             // If the item is already in favorites, remove it
@@ -68,10 +87,10 @@ function ListCompactItem({key,navigation,item,handleSnackbar}) {
         };
 
         fetchData();
-      }, [adData,adExistsInFavorites]);
+      }, [changeInData]);
 
 
-  return (
+  return <>
     <TouchableOpacity  onPress = {()=>{navigation.navigate('ItemDescription',{ item: item })}}>
         <Card style={styles.item}>
             <Card.Cover source={{uri : downloadUrl}} style={styles.itemImage}/>
@@ -88,7 +107,18 @@ function ListCompactItem({key,navigation,item,handleSnackbar}) {
             </Card.Actions>
         </Card>
     </TouchableOpacity>
-  )
+    <Snackbar
+    style = {styles.snackbar}
+    visible={snackbarVisiblility}
+    onDismiss = {()=>{setSnackbarVisibility(false)}}
+    duration = '2000'
+    >
+        <Text style = {styles.snackbarText}>
+            {snackbarValue}
+        </Text>
+    </Snackbar>
+    </>
+
 }
 
 export default ListCompactItem

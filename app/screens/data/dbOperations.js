@@ -171,16 +171,23 @@ const getAd = async (adId) => {
       const favoriteAdsRef = ref(db, `users/${userId}/favorites/`);
       const result = await get(favoriteAdsRef);
       let favoriteAdsIds = result.val() || [];
-      let favoriteAdsArray = []
-      favoriteAdsIds.forEach(async adId=>{
-        let foundAd = await getAd(adId)
-        favoriteAdsArray.push({adId:adId,adData:foundAd})
-      })
-      return favoriteAdsArray
+      let favoriteAdsArray = [];
+
+      // Use map to create an array of promises
+      const fetchPromises = favoriteAdsIds.map(async (adId) => {
+        let foundAd = await getAd(adId);
+        favoriteAdsArray.push({ adId: adId, adData: foundAd });
+      });
+
+      // Wait for all promises to resolve using Promise.all
+      await Promise.all(fetchPromises);
+
+      return favoriteAdsArray;
     } catch (err) {
       throw err;
     }
-  }
+  };
+
 
   // Function to add an ad to a user's favorites
   const addToFavorites = async (userId, adId) => {
@@ -218,14 +225,11 @@ const existsInFavorites = async(userId,adId)=>{
       // Fetch the current favorites array
       const favoritesSnapshot = await get(favoritesRef);
       let favoritesArray = favoritesSnapshot.val() || [];
-      if (favoritesArray.includes(adId)) {
         // Remove the adId from the favorites array
         favoritesArray = favoritesArray.filter(favId => favId !== adId);
         await set(favoritesRef, favoritesArray);
         return 'Ad removed from favorites.'
-      } else {
-        return 'Ad is not in favorites'
-      }
+
     } catch (error) {
       // console.error('Error removing ad from favorites:', error);
       throw error

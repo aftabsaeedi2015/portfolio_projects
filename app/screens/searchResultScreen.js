@@ -16,9 +16,6 @@ function SearchResultScreen({search_query,navigation}) {
   const[snackbarVisiblility,setSnackbarVisibility] = useState(false)
   const [snackbarValue,setSnackbarValue] = useState('')
   console.log(result)
-  const itemSelectionHandler = (item) => {
-    navigation.navigate('ItemDescription',{item : item})
-  }
   const handleSnackbar=(response)=>{
         setSnackbarValue(response)
         setSnackbarVisibility(true)
@@ -29,14 +26,6 @@ function SearchResultScreen({search_query,navigation}) {
       flex: 1,
       flexDirection: 'column',
       justifyContent: 'space-between'
-    },
-    snackbar:{
-      display: 'absolute',
-      top: 550,
-      backgroundColor: theme.colors.background,
-    },
-    snackbarText: {
-      color: 'white'
     }
   })
   return <View style = {styles.parentContainer}>
@@ -46,8 +35,6 @@ function SearchResultScreen({search_query,navigation}) {
             key = {index}
             navigation={navigation}
             item = {item}
-            itemSelectionHandler={itemSelectionHandler}
-            handleSnackbar={handleSnackbar}
             />
           })}
           <Snackbar

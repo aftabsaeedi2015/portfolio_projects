@@ -10,14 +10,14 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ItemDescription from './app/screens/itemDescription';
 import PostItem from './app/screens/postItem';
-import Favorites from './app/screens/favoriteItems';
-import receivedMessagesScreen from './app/screens/receivedMessagesScreen';
+import receivedMessages from './app/screens/receivedMessagesScreen';
 import CategorieScreen from './app/screens/categorieScreen';
 import MessageItem from './app/styledComponents/messageItem';
 import SellerBuyerInteractionScreen from './app/screens/sellerBuyerInteractionScreen';
 import { Provider } from 'react-redux';
 import store from './app/state/store';
 import SuccessAdPostMessage from './app/screens/successAdPostMessage';
+import FavoritesScreen from './app/screens/favoritesScreen.js';
 
 
 export default function App() {
@@ -47,7 +47,7 @@ export default function App() {
           <Stack.Screen name="ItemDescription" component={ItemDescription} />
           {/* <Stack.Screen name="Post" component={PostItem} /> */}
           {/* <Stack.Screen name="Categories" component={CategorieScreen} /> */}
-          <Stack.Screen name="Favorites" component={Favorites} />
+          <Stack.Screen name="Favorites" component={FavoritesScreen} />
           {/* <Stack.Screen name="Message" component={receivedMessagesScreen} /> */}
           {/* <Stack.Screen name = "SellerBuyerInteractionScreen" component={SellerBuyerInteractionScreen}/> */}
           {/* <Stack.Screen name="AdPostSuccess" component={SuccessAdPostMessage} /> */}
