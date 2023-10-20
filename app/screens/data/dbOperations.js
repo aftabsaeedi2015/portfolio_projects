@@ -14,6 +14,10 @@ import { async } from '@firebase/util';
 //   userId: userId,
 //   userData: userData
 // }
+// {
+//   adId: adId,
+//   chatHistory: chatMessages
+// }
 
 
 
@@ -127,9 +131,8 @@ const getAd = async (adId) => {
   try {
     const db = getDatabase(app);
     const adRef = ref(db, `ads/${adId}`);
-
-    const adSnapshot = await get(adRef);
-    const adData = adSnapshot.val();
+    const response = await get(adRef);
+    const adData = response.val()
     return adData
   } catch (err) {
     throw err
@@ -237,28 +240,89 @@ const existsInFavorites = async(userId,adId)=>{
   };
 
 
-const getUserMessages = (userId) => {
+
+const getAdChatsHistory= async (userId,adId) => {
+  const db = getDatabase(app);
+    const userRef = ref(db, `users/${userId}/chatsHistory/${adId}`);
+    try{
+      const response = await get(userRef)
+      const chatHistory = response.val()
+      return chatHistory
+    }
+    catch(err){
+      throw err
+
+    }
+}
+const getAdsInteractedWith= async (userId) => {
+  try{
     const db = getDatabase(app);
+    const chatHistoryRef = ref(db, `users/${userId}/chatInteraction/`);
+    const response = await get(chatHistoryRef)
+    const chatHistory = response.val()
+    const keys = Object.keys(chatHistory)
+    const array = keys.map(async chatInteractionId=>{
+      const adId =chatHistory[chatInteractionId].adId
+      const ad = await getAd(adId)
+      return {adId:adId,adData: ad}
+    })
+    const adsInteractedWith = await Promise.all(array)
+    return adsInteractedWith
+  }
+  catch(err){
+    throw err
+  }
+}
 
-    // Reference to the user's data in the 'users' table
-    const userRef = ref(db, `users/${userId}`);
+const sendMessage = async (adId,userId,message)=>{
+  try{
+    // first check if the ad exists in the interactionHistory
+    const db = getDatabase(app);
+    const userChatInteractionRef = ref(db, `users/${userId}/chatInteraction/`);
+    const response = await get(userChatInteractionRef);
+    const chatInteraction = response.val() || {};
+    console.log(chatInteraction);
+    const chatInteractionIds = Object.keys(chatInteraction);
 
-    // Fetch the user's data
-    get(userRef)
-      .then((userSnapshot) => {
-        if (userSnapshot.exists()) {
-          const userData = userSnapshot.val();
-          const messages = userData.messages || [];
-          console.log('User Messages:', messages);
-        } else {
-          console.log('User not found');
-        }
-      })
-      .catch((error) => {
-        console.error('Error getting user messages:', error);
-      });
-  };
+    let existsInChatInteraction = false;
 
+    for (const chatInteractionId of chatInteractionIds) {
+      const item = chatInteraction[chatInteractionId];
+
+      if (item.adId === adId) {
+        console.log('h');
+        existsInChatInteraction = true;
+
+        const chatInteractionRef = ref(db, `chatInteraction/${chatInteractionId}/`);
+        const chatInteractionResponse = await get(chatInteractionRef);
+        const previousData = chatInteractionResponse.val() || [];
+        const updatedData = [...previousData, { message: message, senderId: userId }];
+
+        await set(chatInteractionRef, updatedData);
+      }
+    }
+
+    // add the chatinteractionid to owner and user when first time interacted
+    if(!existsInChatInteraction){
+      const adRef = ref(db,`ads/${adId}`)
+      const adResponse = await get(adRef)
+      const ad = adResponse.val()
+      const ownerId = ad.ownerId
+      console.log(ownerId)
+      console.log(userId)
+      const chatInteractionRef =  ref(db,'chatInteraction/')
+      const response = await push(chatInteractionRef,[{message:message,senderId: userId}])
+      const chatInteractionId = response.key
+      const userChatInteractionRef = ref(db, `users/${userId}/chatInteraction/${chatInteractionId}/`)
+      const ownerChatInteractionRef = ref(db, `users/-${ownerId}/chatInteraction/${chatInteractionId}/`)
+      await set(userChatInteractionRef,{adId:adId})
+      await set(ownerChatInteractionRef,{adId:adId})
+    }
+  }
+  catch(err){
+    throw err
+  }
+}
   // Function to remove a user from messaging
   const removeFromMessaging = (senderId, receiverId) => {
     const db = app.database();
@@ -279,5 +343,8 @@ const getUserMessages = (userId) => {
     getAllAds,
     getCategoryAds,
     getCoverImage,
-    getAllAdImages
+    getAllAdImages,
+    getAdsInteractedWith,
+    getAdChatsHistory,
+    sendMessage,
   }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import {Text} from 'react-native-paper'
-import {StyleSheet,View,Image, ScrollView} from 'react-native'
+import {Text,Button} from 'react-native-paper'
+import {StyleSheet,View,Image, ScrollView,TouchableOpacity} from 'react-native'
 import  Icon  from 'react-native-vector-icons/FontAwesome'
 // import {MapView,Marker} from 'react-native-maps';
 import ListCompactItem from '../styledComponents/listCompactItem';
@@ -67,6 +67,10 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 200
   },
+  messageButton: {
+    width: '100%',
+    color: 'black'
+  },
   similarItemsContainer: {
     display: 'flex',
     flexDirection: 'row',
@@ -80,6 +84,9 @@ function ItemDescription({navigation}) {
   const route = useRoute();
   const { item } = route.params;
   const [similarAds,setSimilarAds] = useState([])
+  const handleMessaging=()=>{
+    navigation.navigate('SellerBuyerInteractionScreen',item)
+  }
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -169,6 +176,16 @@ function ItemDescription({navigation}) {
             </MapView> */}
           </View>
         </View>
+        <TouchableOpacity>
+              <Button
+              mode="outlined"
+              onPress={()=>handleMessaging()}
+              style = {styles.messageButton}
+              labelStyle={{color: 'black'}}
+              >
+                message
+              </Button>
+            </TouchableOpacity>
         <View>
           <Text>
             similar items

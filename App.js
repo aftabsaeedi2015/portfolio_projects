@@ -10,7 +10,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ItemDescription from './app/screens/itemDescription';
 import PostItem from './app/screens/postItem';
-import receivedMessages from './app/screens/receivedMessagesScreen';
+import ReceivedMessagesScreen from './app/screens/receivedMessagesScreen';
 import CategorieScreen from './app/screens/categorieScreen';
 import MessageItem from './app/styledComponents/messageItem';
 import SellerBuyerInteractionScreen from './app/screens/sellerBuyerInteractionScreen';
@@ -41,16 +41,16 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen name="Login" component={LoginScreen} />
-          {/* <Stack.Screen name="Signup" component={SingupScreen} /> */}
+          <Stack.Screen name="Signup" component={SingupScreen} />
           <Stack.Screen name="Home" component={HomepageScreen} />
           <Stack.Screen name="SearchResult" component={SearchResultScreen} />
           <Stack.Screen name="ItemDescription" component={ItemDescription} />
-          {/* <Stack.Screen name="Post" component={PostItem} /> */}
-          {/* <Stack.Screen name="Categories" component={CategorieScreen} /> */}
+          <Stack.Screen name="Post" component={PostItem} />
+          <Stack.Screen name="Categories" component={CategorieScreen} />
           <Stack.Screen name="Favorites" component={FavoritesScreen} />
-          {/* <Stack.Screen name="Message" component={receivedMessagesScreen} /> */}
-          {/* <Stack.Screen name = "SellerBuyerInteractionScreen" component={SellerBuyerInteractionScreen}/> */}
-          {/* <Stack.Screen name="AdPostSuccess" component={SuccessAdPostMessage} /> */}
+          <Stack.Screen name="Message" component={ReceivedMessagesScreen} />
+          <Stack.Screen name = "SellerBuyerInteractionScreen" component={SellerBuyerInteractionScreen}/>
+          <Stack.Screen name="AdPostSuccess" component={SuccessAdPostMessage} />
         </Stack.Navigator>
       </NavigationContainer>
     </PaperProvider>

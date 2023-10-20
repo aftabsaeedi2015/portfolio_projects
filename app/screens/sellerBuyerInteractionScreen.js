@@ -1,8 +1,11 @@
-import React from 'react'
+import React,{useState,useEffect}from 'react'
 import { View,StyleSheet } from 'react-native'
-import ListItem from '../styledComponents/resultListItem'
+import ResultListItem from '../styledComponents/resultListItem'
 import MessageInput from '../styledComponents/messageInput'
 import {SellerMessage,BuyerMessage} from '../styledComponents/sellerBuyerMessage'
+import { useRoute } from '@react-navigation/native';
+import { useSelector, UseSelector } from 'react-redux'
+import { getAdChatsHistory } from './data/dbOperations'
 
 
 
@@ -13,28 +16,40 @@ const styles = StyleSheet.create({
     }
 })
 function SellerBuyerInteractionScreen({navigation}) {
+    const route = useRoute()
+    const {adId,adData} = route.params
+    const item ={adId: adId,adData:adData}
+    const user = useSelector(state=>state.user)
+    const userId = user.userId
+    const [adChatHistory, setAdChatHistory] = useState([])
     const [messages,setMessages] = React.useState([
         " hello there, i was interested in buying your iphone",
         " hi, yes you can. how much do you bid?"
     ])
-    const handleSendMessage = (message) => {
-        console.log("hell")
-        setMessages([...messages, message]);
-      };
+      useEffect(() => {
+        const fetchAdChatHistory= async () => {
+          try{
+            const chatHistory = await getAdChatsHistory(userId,adId)
+            console.log(chatHistory)
+            const chatHistoryArray = JSON.parse(chatHistory)
+            setAdChatHistory(chatHistoryArray)
+          }
+          catch(err){
+            console.log(err)
+          }
+
+        }
+        // fetchAdChatHistory()
+      }, []);
   return (
     <View style={styles.parentContainer}>
-  <ListItem navigation={navigation} />
-  <SellerMessage message={messages[0]} />
-  <BuyerMessage message={messages[1]} />
-  {messages.map((message, index) => {
-    return  <BuyerMessage key={index} message={message} />
-  })}
-  <MessageInput messages={messages} onSendMessage={handleSendMessage} />
+  <ResultListItem navigation={navigation} key ={adId} item ={item}/>
+  {/* {adChatHistory.map((chat, index) => {
+    console.log(chat)
+    return  <BuyerMessage key={index} message={chat.message} />
+  })} */}
+  <MessageInput adId = {adId}/>
 </View>
-
-
-
-
   )
 }
 

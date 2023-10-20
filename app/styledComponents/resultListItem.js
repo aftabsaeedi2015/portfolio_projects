@@ -5,8 +5,10 @@ import Icon from 'react-native-vector-icons/FontAwesome'
 import { addToFavorites, getCoverImage,existsInFavorites,removeFromFavorites } from '../screens/data/dbOperations'
 import {useSelector,useDispatch} from 'react-redux'
 
+// item is in the following format:
+// {adId: adId,adData: adData}
+
 function ResultListItem({navigation,key,item}) {
-  console.log(item)
   const theme = useTheme()
     const styles = StyleSheet.create({
         parentContainer : {
@@ -44,9 +46,6 @@ function ResultListItem({navigation,key,item}) {
           alignItems: 'center',
           gap: 3,
         },
-        heart:{
-          color: heartColor
-        },
         blackIcon: {
           color: 'black'
         },
@@ -65,10 +64,11 @@ function ResultListItem({navigation,key,item}) {
       }
 
       })
+    const dispatch = useDispatch()
     const user = useSelector(state=>state.user)
     const userId = user.userId
-    const [heartColor,setHeartColor] = useState('')
-    const [downloadUrl,setDownloadUrl] = useState(null)
+    const changeInData = user.changeInData
+    const [imageUrl,setImageUrl] = useState(null)
     const [adExistsInFavorites,setAdExistsInFavorites] = useState(false)
     const[snackbarVisiblility,setSnackbarVisibility] = useState(false)
     const [snackbarValue,setSnackbarValue] = useState('')
@@ -76,46 +76,43 @@ function ResultListItem({navigation,key,item}) {
         setSnackbarValue(response)
         setSnackbarVisibility(true)
       }
-    const addToFavoriteHandler = async () => {
-      try {
-        if (adExistsInFavorites) {
-          // If the item is already in favorites, remove it
-          const response = await removeFromFavorites(userId, item.adId); // You need to create this function
-          handleSnackbar(response);
-          setAdExistsInFavorites(false);
-        } else {
-          // If the item is not in favorites, add it
-          const response = await addToFavorites(userId, item.adId);
-          handleSnackbar(response);
-          setAdExistsInFavorites(true);
+      const addToFavoriteHandler = async () => {
+
+        try {
+          dispatch({type: 'changeInData'})
+          if (adExistsInFavorites) {
+            const response = await removeFromFavorites(userId, item.adId);
+            handleSnackbar(response);
+          } else {
+            const response = await addToFavorites(userId, item.adId);
+            handleSnackbar(response);
+          }
+        } catch (err) {
+          console.log(err);
         }
-      } catch (err) {
-        console.log(err);
-      }
-    };
+      };
+
 
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const downloadURL = await getCoverImage(item.adId);
-          setDownloadUrl(downloadURL);
-
-          // decide the color of the heart
+          const url = await getCoverImage(item.adId);
+          setImageUrl(url);
           const exists = await existsInFavorites(userId, item.adId);
-          setHeartColor(exists ? 'blue' : 'black');
+          setAdExistsInFavorites(exists)
         } catch (err) {
           console.log(err);
         }
       };
 
       fetchData();
-    }, []);
+    }, [changeInData]);
 
   return <>
-    <View style = {styles.parentContainer} key = {key}>
-          <TouchableOpacity onPress={()=>{itemSelectionHandler(item)}}>
-            <Image source={{uri: downloadUrl}} style = {styles.image}/>
-          </TouchableOpacity>
+    <TouchableOpacity style = {styles.parentContainer} key = {key} onPress={()=>{navigation.navigate('ItemDescription',{ item: item })}}>
+          <View>
+            <Image source={{uri: imageUrl}} style = {styles.image}/>
+          </View>
           <View style={styles.descriptionContainer}>
             <View style ={styles.descriptionUp}>
               <Text>
@@ -135,7 +132,7 @@ function ResultListItem({navigation,key,item}) {
               <Icon name="heart" size={20} style={adExistsInFavorites ? styles.blueIcon : styles.blackIcon } onPress={()=>addToFavoriteHandler()}/>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
         <Snackbar
         style = {styles.snackbar}
         visible={snackbarVisiblility}

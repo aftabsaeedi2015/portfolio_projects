@@ -56,12 +56,10 @@ function ListCompactItem({key,navigation,item,fetchRefreshedData}) {
             // If the item is already in favorites, remove it
             const response = await removeFromFavorites(userId, item.adId); // You need to create this function
             handleSnackbar(response);
-            setAdExistsInFavorites(false);
           } else {
             // If the item is not in favorites, add it
             const response = await addToFavorites(userId, item.adId);
             handleSnackbar(response);
-            setAdExistsInFavorites(true);
           }
         } catch (err) {
           console.log(err);

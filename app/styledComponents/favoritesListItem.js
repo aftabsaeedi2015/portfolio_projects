@@ -94,7 +94,7 @@ function FavoritesListItem({navigation,key,item}) {
 
   return <>
     <View style = {styles.parentContainer} key = {key}>
-          <TouchableOpacity onPress={()=>{itemSelectionHandler(item)}}>
+          <TouchableOpacity onPress={()=>{navigation.navigate('ItemDescription',{ item: item })}}>
             <Image source={{uri: downloadUrl}} style = {styles.image}/>
           </TouchableOpacity>
           <View style={styles.descriptionContainer}>
@@ -113,7 +113,9 @@ function FavoritesListItem({navigation,key,item}) {
                 {item.adData.location}
                 </Text>
               </View>
-              <Icon name="close" size={50} style={styles.crossIcon} onPress={()=>removeFromFavoriteAds()}/>
+              <TouchableOpacity onPress={()=>removeFromFavoriteAds()}>
+              <Icon name="close" size={50} style={styles.crossIcon}/>
+              </TouchableOpacity>
             </View>
           </View>
         </View>

@@ -1,4 +1,4 @@
-const message = (postid, message, type) => {
+const CreateMessage = (postid, message, type) => {
     return {
         postid: postid,
         messages: [
@@ -9,6 +9,15 @@ const message = (postid, message, type) => {
         ]
     };
 };
+
+// const adsInteractions = [
+//     {
+//         interactionId:[{messages: [{message: 'hello',senderId: 'senderId'}]}]
+//     }
+// ]
+// const chatInteraction = [
+//     {chatInteractionId: chatInteractionId,adId:adId}
+// ]
 
 const createAd = ({ownerId, title, price, description, location, category}) => {
     return {
@@ -31,5 +40,5 @@ const createUser = ({ name, phone, email}) => {
     };
 };
 
-export {message,createAd,createUser};
+export {CreateMessage,createAd,createUser};
 

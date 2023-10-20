@@ -2,6 +2,7 @@ import React from 'react'
 import {Text} from 'react-native-paper'
 import { StyleSheet,View, TouchableOpacity } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { getCategoryAds } from '../screens/data/dbOperations';
 
 
 const styles =StyleSheet.create({
@@ -20,7 +21,7 @@ const styles =StyleSheet.create({
         alignItems: 'center'
     },
     })
-function ItemCategoriesBar({navigation,categoryHandler}) {
+function ItemCategoriesBar({navigation}) {
     const categories = [
         {
             icon: 'mobile',
@@ -39,10 +40,13 @@ function ItemCategoriesBar({navigation,categoryHandler}) {
             name: 'more categories'
         },
     ]
+    const handleCategorySelection = async (category) => {
+          navigation.navigate('SearchResult', { category: category });
+    }
   return (
     <View style = {styles.categoriesContainer}>
         {categories.map((category,index)=>{
-        return <TouchableOpacity key={index} onPress = {()=>{categoryHandler(category.name)}}>
+        return <TouchableOpacity key={index} onPress = {()=>{handleCategorySelection(category.name)}}>
                     <View style={styles.categoryItem}>
                         <Icon name={category.icon} size={50} style={styles.icon}/>
                         <Text>{category.name}</Text>

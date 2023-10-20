@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button } from 'react-native';
+import { sendMessage } from '../screens/data/dbOperations';
+import { useSelector, UseSelector } from 'react-redux';
 
-const SellerMessageWithInput = ({ onSendMessage }) => {
+const SellerMessageWithInput = ({ adId}) => {
   const [inputMessage, setInputMessage] = useState('');
-
+  const user = useSelector(state=>state.user)
+  const userId = user.userId
   const handleSendMessage = () => {
     if (inputMessage.trim() !== '') {
-      // Call the callback function to add the message to the messages array
-      onSendMessage(inputMessage);
+      sendMessage(adId,userId,inputMessage)
       // Clear the input field
       setInputMessage('');
     }

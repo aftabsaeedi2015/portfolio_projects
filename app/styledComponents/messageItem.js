@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useState,useEffect } from 'react'
 import {Card, Text,useTheme} from 'react-native-paper'
 import { View,StyleSheet, Image, TouchableOpacity} from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome'
+import { getAd, getCoverImage } from '../screens/data/dbOperations'
 
 const styles = StyleSheet.create({
     parentContainer : {
@@ -36,9 +37,12 @@ const styles = StyleSheet.create({
 
   })
 
-function MessageItem({navigation}) {
+function MessageItem({navigation,chatHistory}) {
     const theme = useTheme()
-
+    const adId = chatHistory.adId
+    const messages = chatHistory.chatHistory
+    const [adData,setAdData] = useState({})
+    const [imageUrl, setimageUrl] = useState('')
     const styles = StyleSheet.create({
         parentContainer : {
           display: 'flex',
@@ -71,19 +75,33 @@ function MessageItem({navigation}) {
         }
 
       })
+      useEffect(() => {
+        const fetchAdData=async ()=>{
+            try{
+                const url = await getCoverImage(adId)
+                const adData = await getAd(adId)
+                setAdData(adData)
+                setimageUrl(url)
+            }
+            catch(err){
+                console.log(err)
+            }
+        }
+        fetchAdData()
 
+      }, []);
   return (
         <View style = {styles.parentContainer}>
-          <TouchableOpacity onPress={()=>{navigation.navigate('SellerBuyerInteractionScreen')}}>
-            <Image source={require('../assets/phone.jpg')} style = {styles.image}/>
+          <TouchableOpacity onPress={()=>{navigation.navigate('SellerBuyerInteractionScreen',{adId:adId,adData: adData})}}>
+            <Image source={{uri:imageUrl}} style = {styles.image}/>
           </TouchableOpacity>
             <View style = {styles.description}>
                 <View style = {styles.titleAndPrice}>
                     <Text style = {styles.text}>
-                        iphone x
+                        {adData.title}
                     </Text>
                     <Text style = {styles.text}>
-                        1000$
+                    {adData.price}
                     </Text>
                 </View>
                 <View style ={styles.messageContainer}>
@@ -95,9 +113,7 @@ function MessageItem({navigation}) {
                     2 hours ago
                 </Text>
             </View>
-
         </View>
-
   )
 }
 

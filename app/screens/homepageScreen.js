@@ -17,14 +17,6 @@ function HomepageScreen({navigation}) {
     const user = useSelector(state=>state.user)
     const changeInData = user.changeInData
     const handleSearch = ()=>{console.log(searchQuery)}
-    const handleCategorySelection = async (category) => {
-        try {
-          const result = await getCategoryAds(category);
-          navigation.navigate('SearchResult', { result: result });
-        } catch (err) {
-          console.log(err);
-        }
-      };
       const fetchData = async () => {
         try {
           const allAds = await getAllAds();
@@ -88,7 +80,7 @@ function HomepageScreen({navigation}) {
             navigation={navigation}
             />
         </View>
-        {<ItemCategoriesBar navigation ={navigation} categoryHandler = {handleCategorySelection}/>}
+        {<ItemCategoriesBar navigation ={navigation}/>}
         <ScrollView contentContainerStyle = {styles.itemContainer}>
             <View style={styles.itemRow}>
                 {ads.map((ad,index)=>{
