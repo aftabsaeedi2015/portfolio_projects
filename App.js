@@ -12,7 +12,6 @@ import ItemDescription from './app/screens/itemDescription';
 import PostItem from './app/screens/postItem';
 import ReceivedMessagesScreen from './app/screens/receivedMessagesScreen';
 import CategorieScreen from './app/screens/categorieScreen';
-import MessageItem from './app/styledComponents/messageItem';
 import SellerBuyerInteractionScreen from './app/screens/sellerBuyerInteractionScreen';
 import { Provider } from 'react-redux';
 import store from './app/state/store';

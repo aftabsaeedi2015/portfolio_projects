@@ -1,6 +1,6 @@
 import React,{useState,useEffect} from 'react'
 import { Text } from 'react-native-paper'
-import MessageItem from '../styledComponents/messageItem'
+import MessageListItem from '../styledComponents/MessageListItem'
 import {useSelector} from 'react-redux'
 import { getAdsInteractedWith, getSendOrReceivedMessages } from './data/dbOperations'
 import {View} from 'react-native'
@@ -15,7 +15,7 @@ function ReceivedMessagesScreen({navigation}) {
     const fetchUserChatHistory = async () => {
       try{
         const chatsInteractedWith = await getAdsInteractedWith(userId)
-        console.log(chatsInteractedWith)
+        console.log("these are the chats",chatsInteractedWith)
         setChatHistory(chatsInteractedWith)
       }
       catch(err){
@@ -26,9 +26,8 @@ function ReceivedMessagesScreen({navigation}) {
   },[changeInData])
   return (
     <View>
-    {chatHistory.map(chatHistory=>{
-      {console.log(chatHistory)}
-      return <MessageItem navigation={navigation} chatHistory={chatHistory}/>
+    {chatHistory.map(ad=>{
+      return <MessageListItem navigation={navigation} ad={ad}/>
     })}
     </View>
   )

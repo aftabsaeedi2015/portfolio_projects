@@ -254,6 +254,22 @@ const getAdChatsHistory= async (userId,adId) => {
 
     }
 }
+
+const getChatInteractionHistory=async(chatInteractionId)=>{
+  try{
+    const db = getDatabase(app)
+    const chatInteractionRef = ref(db,`chatInteraction/${chatInteractionId}`)
+    const response = await get(chatInteractionRef)
+    const chats = response.val()
+    return chats
+  }
+  catch(err){
+    throw err
+  }
+
+
+}
+
 const getAdsInteractedWith= async (userId) => {
   try{
     const db = getDatabase(app);
@@ -264,7 +280,7 @@ const getAdsInteractedWith= async (userId) => {
     const array = keys.map(async chatInteractionId=>{
       const adId =chatHistory[chatInteractionId].adId
       const ad = await getAd(adId)
-      return {adId:adId,adData: ad}
+      return {chatInteractionId: chatInteractionId,adId:adId,adData: ad}
     })
     const adsInteractedWith = await Promise.all(array)
     return adsInteractedWith
@@ -347,4 +363,5 @@ const sendMessage = async (adId,userId,message)=>{
     getAdsInteractedWith,
     getAdChatsHistory,
     sendMessage,
+    getChatInteractionHistory
   }

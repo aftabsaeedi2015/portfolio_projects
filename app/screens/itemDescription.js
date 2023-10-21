@@ -5,7 +5,7 @@ import  Icon  from 'react-native-vector-icons/FontAwesome'
 // import {MapView,Marker} from 'react-native-maps';
 import ListCompactItem from '../styledComponents/listCompactItem';
 import { useRoute } from '@react-navigation/native';
-import { getCategoryAds } from './data/dbOperations';
+import { getAdsInteractedWith, getCategoryAds } from './data/dbOperations';
 
 const styles = StyleSheet.create({
   parentContainer: {
@@ -82,15 +82,17 @@ const styles = StyleSheet.create({
 
 function ItemDescription({navigation}) {
   const route = useRoute();
-  const { item } = route.params;
+  const { ad } = route.params;
   const [similarAds,setSimilarAds] = useState([])
   const handleMessaging=()=>{
-    navigation.navigate('SellerBuyerInteractionScreen',item)
+    navigation.navigate('SellerBuyerInteractionScreen',ad)
   }
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await getCategoryAds(item.adData.category);
+        // const chatsInteractedWith = await getAdsInteractedWith(userId)
+
+        const result = await getCategoryAds(ad.adData.category);
         setSimilarAds(result);
       } catch (err) {
         console.log(err);
@@ -99,6 +101,12 @@ function ItemDescription({navigation}) {
 
     fetchData();
   }, []);
+
+
+
+
+
+
 
 
   const similarItems = [

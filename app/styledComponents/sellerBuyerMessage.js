@@ -1,35 +1,46 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text ,StyleSheet} from 'react-native';
 import { Avatar, Card, Paragraph } from 'react-native-paper';
 
-const SellerMessage = ({ message }) => {
+const ChatBubble = ({ key,message, isSent, profilePic }) => {
   return (
-    <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-      <Card style={{ backgroundColor: 'lightblue', maxWidth: '70%' }}>
-        <Card.Content>
-          <Paragraph>{message}</Paragraph>
-        </Card.Content>
-      </Card>
-      <View style={{ marginRight: 16 }}>
-        <Avatar.Image size={40} source={require('../assets/phone.jpg')} />
-      </View>
-    </View>
+    <Card
+    key = {key}
+      style={[
+        styles.chatBubble,
+        isSent ? styles.sentBubble : styles.receivedBubble,
+      ]}
+    >
+      <Card.Content style={styles.cardContent}>
+        <Avatar.Image size={40} source={profilePic ? { uri: profilePic } : null} />
+        <Text style={styles.messageText}>{message}</Text>
+      </Card.Content>
+    </Card>
   );
 };
+const styles = StyleSheet.create({
+  container: {
+    padding: 16,
+  },
+  chatBubble: {
+    maxWidth: '70%',
+    alignSelf: 'flex-end',
+    marginVertical: 8,
+  },
+  sentBubble: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#007BFF',
+  },
+  receivedBubble: {
+    backgroundColor: '#FFFFFF',
+  },
+  cardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  messageText: {
+    marginLeft: 10,
+  },
+});
 
-const BuyerMessage = ({ message }) => {
-  return (
-    <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
-      <View style={{ marginLeft: 16 }}>
-        <Avatar.Image size={40} source={require('../assets/phone.jpg')} />
-      </View>
-      <Card style={{ backgroundColor: 'lightgray', maxWidth: '70%' }}>
-        <Card.Content>
-          <Paragraph>{message}</Paragraph>
-        </Card.Content>
-      </Card>
-    </View>
-  );
-};
-
-export { SellerMessage, BuyerMessage };
+export { ChatBubble };

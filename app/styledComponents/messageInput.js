@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button } from 'react-native';
 import { sendMessage } from '../screens/data/dbOperations';
-import { useSelector, UseSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 const SellerMessageWithInput = ({ adId}) => {
   const [inputMessage, setInputMessage] = useState('');
   const user = useSelector(state=>state.user)
+  const dispatch = useDispatch()
   const userId = user.userId
-  const handleSendMessage = () => {
+  const handleSendMessage = async() => {
     if (inputMessage.trim() !== '') {
-      sendMessage(adId,userId,inputMessage)
+      await sendMessage(adId,userId,inputMessage)
+      dispatch({type: 'changeInData'})
       // Clear the input field
       setInputMessage('');
+
     }
   };
 

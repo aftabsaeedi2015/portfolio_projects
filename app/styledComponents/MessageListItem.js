@@ -3,45 +3,14 @@ import {Card, Text,useTheme} from 'react-native-paper'
 import { View,StyleSheet, Image, TouchableOpacity} from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import { getAd, getCoverImage } from '../screens/data/dbOperations'
+import { useSelector, useDispatch } from 'react-redux';
 
-const styles = StyleSheet.create({
-    parentContainer : {
-      display: 'flex',
-      flexDirection: 'row',
-      padding: 10,
-      gap: 5,
-      backgroundColor: 'red'
-    },
-    image: {
-      height: 100,
-      width: 100,
-      borderRadius: 3
-    },
-    description: {
-        gap: 10,
-        justifyContent: 'space-between',
-        flex: 1,
-        backgroundColor: 'white',
-        borderRadius: 3,
-        padding: 5
-    },
-    message:{
-        fontStyle: 'italic'
-    },
-    text: {
-        fontWeight: 'bold'
-    },
-    time: {
-        alignSelf: 'flex-end'
-    }
 
-  })
 
-function MessageItem({navigation,chatHistory}) {
+function MessageListItem({navigation,ad}) {
     const theme = useTheme()
-    const adId = chatHistory.adId
-    const messages = chatHistory.chatHistory
-    const [adData,setAdData] = useState({})
+    const user = useSelector(state=>state.user)
+    const {chatInteractionId,adId,adData} = ad
     const [imageUrl, setimageUrl] = useState('')
     const styles = StyleSheet.create({
         parentContainer : {
@@ -79,9 +48,8 @@ function MessageItem({navigation,chatHistory}) {
         const fetchAdData=async ()=>{
             try{
                 const url = await getCoverImage(adId)
-                const adData = await getAd(adId)
-                setAdData(adData)
                 setimageUrl(url)
+
             }
             catch(err){
                 console.log(err)
@@ -92,7 +60,7 @@ function MessageItem({navigation,chatHistory}) {
       }, []);
   return (
         <View style = {styles.parentContainer}>
-          <TouchableOpacity onPress={()=>{navigation.navigate('SellerBuyerInteractionScreen',{adId:adId,adData: adData})}}>
+          <TouchableOpacity onPress={()=>{navigation.navigate('SellerBuyerInteractionScreen',ad)}}>
             <Image source={{uri:imageUrl}} style = {styles.image}/>
           </TouchableOpacity>
             <View style = {styles.description}>
@@ -117,4 +85,4 @@ function MessageItem({navigation,chatHistory}) {
   )
 }
 
-export default MessageItem
+export default MessageListItem
