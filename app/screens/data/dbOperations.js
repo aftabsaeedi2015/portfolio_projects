@@ -283,7 +283,7 @@ const getAdsInteractedWith= async (userId) => {
     const array = keys.map(async chatInteractionId=>{
       const adId =chatHistory[chatInteractionId].adId
       const ad = await getAd(adId)
-      return {chatInteractionId: chatInteractionId,adId:adId,adData: ad}
+      return {adId:adId,adData: ad}
     })
     const adsInteractedWith = await Promise.all(array)
     return adsInteractedWith
@@ -355,7 +355,7 @@ const sendMessage = async (adId,userId,message)=>{
       const response = await push(chatInteractionRef,[{message:message,senderId: userId}])
       const chatInteractionId = response.key
       const userChatInteractionRef = ref(db, `users/${userId}/chatInteraction/${chatInteractionId}/`)
-      const ownerChatInteractionRef = ref(db, `users/-${ownerId}/chatInteraction/${chatInteractionId}/`)
+      const ownerChatInteractionRef = ref(db, `users/${ownerId}/chatInteraction/${chatInteractionId}/`)
       await set(userChatInteractionRef,{adId:adId})
       await set(ownerChatInteractionRef,{adId:adId})
     }

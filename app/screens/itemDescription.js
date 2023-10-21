@@ -88,15 +88,12 @@ function ItemDescription({navigation}) {
   const route = useRoute();
   const { item } = route.params;
   const [similarAds,setSimilarAds] = useState([])
-  const [chatInteractionId, setChatInteractionId] = useState('')
   const handleMessaging=()=>{
-    navigation.navigate('SellerBuyerInteractionScreen',{chatInteractionId: chatInteractionId,adId: item.adId,adData: item.adData })
+    navigation.navigate('SellerBuyerInteractionScreen',{adId: item.adId,adData: item.adData })
   }
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const foundAdInteractionId = await getAdInteractionId(userId,item.adId)
-        setChatInteractionId(foundAdInteractionId)
         const result = await getCategoryAds(item.adData.category);
         setSimilarAds(result);
       } catch (err) {
