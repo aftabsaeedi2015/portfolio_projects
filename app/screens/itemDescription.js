@@ -5,7 +5,8 @@ import  Icon  from 'react-native-vector-icons/FontAwesome'
 // import {MapView,Marker} from 'react-native-maps';
 import ListCompactItem from '../styledComponents/listCompactItem';
 import { useRoute } from '@react-navigation/native';
-import { getAdsInteractedWith, getCategoryAds } from './data/dbOperations';
+import { getAdInteractionId, getCategoryAds } from './data/dbOperations';
+import { useSelector, UseSelector } from 'react-redux';
 
 const styles = StyleSheet.create({
   parentContainer: {
@@ -81,18 +82,22 @@ const styles = StyleSheet.create({
 })
 
 function ItemDescription({navigation}) {
+  const user = useSelector(state=>state.user)
+  const userId = user.userId
+  const changeInData = user.changeInData
   const route = useRoute();
-  const { ad } = route.params;
+  const { item } = route.params;
   const [similarAds,setSimilarAds] = useState([])
+  const [chatInteractionId, setChatInteractionId] = useState('')
   const handleMessaging=()=>{
-    navigation.navigate('SellerBuyerInteractionScreen',ad)
+    navigation.navigate('SellerBuyerInteractionScreen',{chatInteractionId: chatInteractionId,adId: item.adId,adData: item.adData })
   }
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // const chatsInteractedWith = await getAdsInteractedWith(userId)
-
-        const result = await getCategoryAds(ad.adData.category);
+        const foundAdInteractionId = await getAdInteractionId(userId,item.adId)
+        setChatInteractionId(foundAdInteractionId)
+        const result = await getCategoryAds(item.adData.category);
         setSimilarAds(result);
       } catch (err) {
         console.log(err);
@@ -100,13 +105,7 @@ function ItemDescription({navigation}) {
     };
 
     fetchData();
-  }, []);
-
-
-
-
-
-
+  }, [changeInData]);
 
 
   const similarItems = [

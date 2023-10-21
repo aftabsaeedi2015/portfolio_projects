@@ -23,16 +23,17 @@ function SellerBuyerInteractionScreen({navigation}) {
     const route = useRoute()
     console.log(route.params)
     const {chatInteractionId,adId,adData} = route.params
+    console.log(chatInteractionId)
     const item ={adId: adId,adData:adData}
     const user = useSelector(state=>state.user)
     const userId = user.userId
     const changeInData = user.changeInData
-    const [chatInteraction, setchatInteraction] = useState([])
+    const [chats, setChats] = useState([])
       useEffect(() => {
         const fetchAdChatHistory= async () => {
           try{
             const response = await getChatInteractionHistory(chatInteractionId)
-            setchatInteraction(response)
+            setChats(response)
           }
           catch(err){
             console.log(err)
@@ -48,7 +49,7 @@ function SellerBuyerInteractionScreen({navigation}) {
     return  <BuyerMessage key={index} message={chat.message} />
   })} */}
   <ScrollView style = {styles.messagesContainer}>
-  {chatInteraction.map(chat=>{
+  {chats==='' ? null:chats.map(chat=>{
     const senderId = chat.senderId
     const myMessage = senderId===userId
     return <ChatBubble key={Math.random()} message={chat.message} isSent={myMessage}/>

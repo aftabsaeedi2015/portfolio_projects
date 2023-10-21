@@ -10,7 +10,7 @@ import { useSelector, useDispatch } from 'react-redux';
 function MessageListItem({navigation,ad}) {
     const theme = useTheme()
     const user = useSelector(state=>state.user)
-    const {chatInteractionId,adId,adData} = ad
+    const {adId,adData} = ad
     const [imageUrl, setimageUrl] = useState('')
     const styles = StyleSheet.create({
         parentContainer : {
