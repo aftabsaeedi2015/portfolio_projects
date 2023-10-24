@@ -5,7 +5,7 @@ import  Icon  from 'react-native-vector-icons/FontAwesome'
 // import {MapView,Marker} from 'react-native-maps';
 import ListCompactItem from '../styledComponents/listCompactItem';
 import { useRoute } from '@react-navigation/native';
-import { getAdInteractionId, getCategoryAds } from './data/dbOperations';
+import { existsInUserAds, getAdInteractionId, getCategoryAds } from './data/dbOperations';
 import { useSelector, UseSelector } from 'react-redux';
 
 const styles = StyleSheet.create({
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   desccription: {
     padding: 10,
     backgroundColor: 'white',
-    borderRadius: 5
+    // borderRadius: 5
   },
   profileDetails: {
     display: 'flex',
@@ -48,11 +48,11 @@ const styles = StyleSheet.create({
     gap: 10,
     backgroundColor: 'white',
     padding: 10,
-    borderRadius: 5
+    // borderRadius: 5
 
   },
   profileImage: {
-    borderRadius: '50%',
+    // borderRadius: '50%',
     height: 70,
     width: 70
   },
@@ -88,12 +88,15 @@ function ItemDescription({navigation}) {
   const route = useRoute();
   const { item } = route.params;
   const [similarAds,setSimilarAds] = useState([])
+  const [adExistsInUserAds, setAdExistsInUserAds] = useState(false)
   const handleMessaging=()=>{
     navigation.navigate('SellerBuyerInteractionScreen',{adId: item.adId,adData: item.adData })
   }
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const response = await existsInUserAds(userId,item.adId)
+        setAdExistsInUserAds(response)
         const result = await getCategoryAds(item.adData.category);
         setSimilarAds(result);
       } catch (err) {
@@ -180,8 +183,10 @@ function ItemDescription({navigation}) {
             </MapView> */}
           </View>
         </View>
+        {adExistsInUserAds ?
+        null :
         <TouchableOpacity>
-              <Button
+          <Button
               mode="outlined"
               onPress={()=>handleMessaging()}
               style = {styles.messageButton}
@@ -190,6 +195,7 @@ function ItemDescription({navigation}) {
                 message
               </Button>
             </TouchableOpacity>
+            }
         <View>
           <Text>
             similar items

@@ -17,6 +17,7 @@ import { Provider } from 'react-redux';
 import store from './app/state/store';
 import SuccessAdPostMessage from './app/screens/successAdPostMessage';
 import FavoritesScreen from './app/screens/favoritesScreen.js';
+import MyAdsScreen from './app/screens/myAdsScreen';
 
 
 export default function App() {
@@ -42,6 +43,7 @@ export default function App() {
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Signup" component={SingupScreen} />
           <Stack.Screen name="Home" component={HomepageScreen} />
+          <Stack.Screen name="MyAds" component={MyAdsScreen} />
           <Stack.Screen name="SearchResult" component={SearchResultScreen} />
           <Stack.Screen name="ItemDescription" component={ItemDescription} />
           <Stack.Screen name="Post" component={PostItem} />

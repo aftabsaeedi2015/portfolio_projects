@@ -3,12 +3,12 @@ import {StyleSheet} from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {Text,Card,Button,useTheme, ThemeProvider,Snackbar} from 'react-native-paper'
 import { TouchableOpacity } from 'react-native'
-import { existsInFavorites, getCoverImage,addToFavorites,removeFromFavorites } from '../screens/data/dbOperations';
+import { existsInFavorites, getCoverImage,addToFavorites,removeFromFavorites, existsInUserAds } from '../screens/data/dbOperations';
 import {useSelector,useDispatch} from 'react-redux'
 
 
 // accepts object in the form of {adId: adId,adData:adData}
-function ListCompactItem({key,navigation,item,fetchRefreshedData}) {
+function ListCompactItem({navigation,item,fetchRefreshedData}) {
     const theme = useTheme()
     const styles = StyleSheet.create({
         item: {
@@ -45,6 +45,7 @@ function ListCompactItem({key,navigation,item,fetchRefreshedData}) {
     const [downloadUrl,setDownloadUrl] = useState(null)
     const[snackbarVisiblility,setSnackbarVisibility] = useState(false)
     const [snackbarValue,setSnackbarValue] = useState('')
+    const [adExistsInUserAds, setAdExistsInUserAds] = useState(false)
     const handleSnackbar=(response)=>{
         setSnackbarValue(response)
         setSnackbarVisibility(true)
@@ -70,7 +71,11 @@ function ListCompactItem({key,navigation,item,fetchRefreshedData}) {
       useEffect(() => {
         const fetchData = async () => {
           try {
+            const response = await existsInUserAds(userId,item.adId)
+            setAdExistsInUserAds(response)
+            console.log(adId)
             const downloadURL = await getCoverImage(adId);
+            console.log('download url is ',downloadURL)
             setDownloadUrl(downloadURL);
 
             // Set the ad data
@@ -101,7 +106,13 @@ function ListCompactItem({key,navigation,item,fetchRefreshedData}) {
                 </Text>
             </Card.Content>
             <Card.Actions>
-            <Icon name="heart" size={20} style={adExistsInFavorites ? styles.blueIcon : styles.blackIcon } onPress={()=>addToFavoriteHandler()}/>
+            {adExistsInUserAds ? null:
+            <Icon
+            name="heart"
+            size={20}
+            style={adExistsInFavorites ? styles.blueIcon : styles.blackIcon }
+            onPress={()=>addToFavoriteHandler()}/>
+            }
             </Card.Actions>
         </Card>
     </TouchableOpacity>

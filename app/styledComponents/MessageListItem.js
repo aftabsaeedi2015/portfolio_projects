@@ -1,5 +1,5 @@
 import React, { useState,useEffect } from 'react'
-import {Card, Text,useTheme} from 'react-native-paper'
+import {Card, Text,useTheme,Checkbox} from 'react-native-paper'
 import { View,StyleSheet, Image, TouchableOpacity} from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import { getAd, getCoverImage } from '../screens/data/dbOperations'
@@ -7,11 +7,12 @@ import { useSelector, useDispatch } from 'react-redux';
 
 
 
-function MessageListItem({navigation,ad}) {
+function MessageListItem({navigation,ad,addToSelectedAdInteractions}) {
     const theme = useTheme()
     const user = useSelector(state=>state.user)
     const {adId,adData} = ad
     const [imageUrl, setimageUrl] = useState('')
+    const [selectionStatus, setSelectionStatus] = useState(false)
     const styles = StyleSheet.create({
         parentContainer : {
           display: 'flex',
@@ -77,6 +78,20 @@ function MessageListItem({navigation,ad}) {
                         hello, i was interested to buy your iphone x
                     </Text>
                 </View>
+                <View stylel = {styles.checkboxContainer}>
+              <Checkbox
+                status = {selectionStatus ? 'checked':'indeterminate'}
+                onPress={() => {
+                    setSelectionStatus(prevStatus => {
+                    const updatedStatus = !prevStatus;
+                    addToSelectedAdInteractions(adId, updatedStatus);
+                    return updatedStatus;
+                    });
+                }}
+                color={theme.colors.background}
+                style = {{backgroundColor: 'red'}}
+                />
+              </View>
                 <Text style = {styles.time}>
                     2 hours ago
                 </Text>

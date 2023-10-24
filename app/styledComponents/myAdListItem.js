@@ -1,14 +1,14 @@
 import React , { useEffect, useState } from 'react'
-import {Card, Text,Snackbar, ThemeProvider,useTheme} from 'react-native-paper'
+import {Card, Text,Snackbar,useTheme,Checkbox} from 'react-native-paper'
 import { View,StyleSheet, Image, TouchableOpacity} from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome'
-import { addToFavorites, getCoverImage,existsInFavorites,removeFromFavorites, existsInUserAds } from '../screens/data/dbOperations'
+import { addToFavorites, getCoverImage,existsInFavorites,removeFromFavorites } from '../screens/data/dbOperations'
 import {useSelector,useDispatch} from 'react-redux'
 
 // item is in the following format:
 // {adId: adId,adData: adData}
 
-function ResultListItem({navigation,item}) {
+function MyAdListItem({navigation,item,addToSelectedAds}) {
   const theme = useTheme()
     const styles = StyleSheet.create({
         parentContainer : {
@@ -61,6 +61,10 @@ function ResultListItem({navigation,item}) {
         },
       snackbarText: {
       color: 'white'
+      },
+      checkboxContainer:{
+        // borderRadius: 1,
+        borderColor: 'black'
       }
 
       })
@@ -68,41 +72,21 @@ function ResultListItem({navigation,item}) {
     const user = useSelector(state=>state.user)
     const userId = user.userId
     const changeInData = user.changeInData
-    const [imageUrl,setImageUrl] = useState(null)
-    const [adExistsInFavorites,setAdExistsInFavorites] = useState(false)
+    const [imageUrl,setImageUrl] = useState('')
     const[snackbarVisiblility,setSnackbarVisibility] = useState(false)
     const [snackbarValue,setSnackbarValue] = useState('')
-    const [adExistsInUserAds, setAdExistsInUserAds] = useState(false)
+    const [status, setStatus] = useState(false)
     const handleSnackbar=(response)=>{
         setSnackbarValue(response)
         setSnackbarVisibility(true)
       }
-      const addToFavoriteHandler = async () => {
-
-        try {
-          dispatch({type: 'changeInData'})
-          if (adExistsInFavorites) {
-            const response = await removeFromFavorites(userId, item.adId);
-            handleSnackbar(response);
-          } else {
-            const response = await addToFavorites(userId, item.adId);
-            handleSnackbar(response);
-          }
-        } catch (err) {
-          console.log(err);
-        }
-      };
 
 
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const response = await existsInUserAds(userId,item.adId)
-          setAdExistsInUserAds(response)
           const url = await getCoverImage(item.adId);
           setImageUrl(url);
-          const exists = await existsInFavorites(userId, item.adId);
-          setAdExistsInFavorites(exists)
         } catch (err) {
           console.log(err);
         }
@@ -132,13 +116,20 @@ function ResultListItem({navigation,item}) {
                 {item.adData.location}
                 </Text>
               </View>
-              {adExistsInUserAds ? null:
-            <Icon
-            name="heart"
-            size={20}
-            style={adExistsInFavorites ? styles.blueIcon : styles.blackIcon }
-            onPress={()=>addToFavoriteHandler()}/>
-            }
+              <View stylel = {styles.checkboxContainer}>
+              <Checkbox
+            status = {status ? 'checked':'indeterminate'}
+            onPress={() => {
+                setStatus(prevStatus => {
+                  const updatedStatus = !prevStatus;
+                  addToSelectedAds(item.adId, updatedStatus);
+                  return updatedStatus;
+                });
+              }}
+              color={theme.colors.background}
+              style = {{backgroundColor: 'red'}}
+            />
+              </View>
             </View>
           </View>
         </TouchableOpacity>
@@ -155,4 +146,4 @@ function ResultListItem({navigation,item}) {
       </>
 }
 
-export default ResultListItem
+export default MyAdListItem

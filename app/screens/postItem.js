@@ -7,7 +7,7 @@ import {app} from '../../firebase'
 import {getStorage,ref,uploadBytes,listAll, getDownloadURL} from 'firebase/storage'
 import * as ImagePicker from 'expo-image-picker';
 import {useSelector} from 'react-redux'
-import {addUserAd} from '../screens/data/dbOperations'
+import {addUserAd, uploadImages} from '../screens/data/dbOperations'
 import {createAd} from '../screens/data/dataModel'
 
 
@@ -55,12 +55,11 @@ function PostItem({navigation}) {
   const selectImage = async () => {
     let results = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
       aspect: [4, 3],
-      quality: 1,
+      quality: 0.2,
       allowsMultipleSelection: true
     });
-    if (!results.cancelled) {
+    if (!results.canceled) {
       const image_uri = results.assets[0].uri
 
       setImageUrls([...imageUrls,image_uri])
@@ -72,17 +71,10 @@ function PostItem({navigation}) {
       const ownerId = userId.userId
       console.log(ad)
       const adModel = createAd({ownerId: ownerId,title: ad.title,price: ad.price,description: ad.description,location:ad.location,category: ad.category})
-      const adInfo = addUserAd(ownerId,adModel)
+      const adInfo = await addUserAd(ownerId,adModel)
       console.log(adInfo)
-      await Promise.all(
-        imageUrls.map(async (image_uri) => {
-          const response = await fetch(image_uri);
-          const blob = await response.blob();
-          const storageRef = ref(storage, `images/${adInfo.adId}/${new Date().getTime()}.jpg`);
-          await uploadBytes(storageRef, blob);
-        })
-      );
-      navigation.navigate('AdPostSuccess')
+      const response = await uploadImages(imageUrls,adInfo.adId)
+      navigation.navigate('MyAds')
     } catch (err) {
       console.error('Error uploading images:', err);
     }
@@ -320,7 +312,7 @@ function PostItem({navigation}) {
             </View>
           </View>
           <View style = {styles.buttonContainer}>
-            
+
             <Button
             mode="filled"
             onPress={()=>{handlePostAd()}}

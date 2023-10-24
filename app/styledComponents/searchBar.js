@@ -50,7 +50,7 @@ function SearchBar({ placeholder, value, onChangeText,handleSearch,navigation })
         <Icon
         name="arrow-right"
         size={20} style={styles.icon}
-        onPress={()=>navigation.navigate('SearchResult')}
+        onPress={()=>navigation.navigate('SearchResult',{category: value})}
         />
       </TouchableOpacity>
     </View>

@@ -8,9 +8,9 @@ import MainMenuBar from '../styledComponents/mainMenuBar';
 import ItemCategoriesBar from '../styledComponents/itemCategoriesBar';
 import {getAllAds, getCategoryAds} from './data/dbOperations'
 import {useSelector} from 'react-redux'
+import { useFocusEffect } from '@react-navigation/native';
 
 function HomepageScreen({navigation}) {
-  console.log('home')
     const [ads,setAds] = useState([])
     const theme = useTheme()
     const [searchQuery, setSearchQuery] = React.useState('');
@@ -26,9 +26,12 @@ function HomepageScreen({navigation}) {
           setAds(adsArray);
         } catch (err) {console.log(err)}
       };
-    useEffect( ()=>{
-          fetchData();
-    },[changeInData])
+      // everytime user navigates to this page it gets the updated data
+      useFocusEffect(
+        React.useCallback(() => {
+          fetchData()
+        }, [])
+      );
     const styles =StyleSheet.create({
         safeArea: {
             flex: 1,

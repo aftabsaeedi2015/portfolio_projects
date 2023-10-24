@@ -1,6 +1,6 @@
 import {app} from '../../../firebase'
-import { getDatabase,ref,set,push,key,get} from 'firebase/database';
-import {getBlob, getDownloadURL, getStorage,list,listAll,ref as sref} from 'firebase/storage'
+import { getDatabase,ref,set,push,key,get, remove} from 'firebase/database';
+import {getBlob, getStorage,list,listAll,ref as sref,uploadBytes, getDownloadURL} from 'firebase/storage'
 import { async } from '@firebase/util';
 
 
@@ -18,57 +18,45 @@ import { async } from '@firebase/util';
 //   adId: adId,
 //   chatHistory: chatMessages
 // }
+const getUserInfo = async(userId)=>{
+  try {
+    const db = getDatabase(app);
+    const userRef = ref(db, `users/${userId}`);
+    const user = await (await get(userRef)).val()
+    return user
+
+  } catch (err) {
+    throw err
+
+  }
 
 
-
-
-
-// Function to add a user ad to Firebase and update myposts and the ad table
-const addUserAd = (userId,ad) => {
-    // const userId = 'H6GW5h0J2AfQ3DODVNHujNtRYSg2'
-    // const ad = {
-    //     postId: 'id1',
-    //     ownerId: 'H6GW5h0J2AfQ3DODVNHujNtRYSg2',
-    //     title: 'title',
-    //     price: 'price',
-    //     description: 'description',
-    //     location: 'location',
-    //     images: 'images',
-    //     category: 'category'
-    // }
+}
+const addUserAd = async (userId,ad) => {
+  try {
     const db = getDatabase(app);
     const adsRef = ref(db, `ads`);
-
-    // Generate a new ad key for the ad being added
-    const newAdRef = push(adsRef);
-
-    // Get the key of the new ad
+    const newAdRef = await push(adsRef);
     const newAdKey = newAdRef.key;
-
-    // Set the ad data in the ad table
-    set(newAdRef, ad);
-
-    // Update the user's myposts array with the new ad key
+    await set(newAdRef, ad);
     const userMypostsRef = ref(db, `users/${userId}/myAds/${newAdKey}`);
-    set(userMypostsRef, true);
+    await set(userMypostsRef, true);
     return {userId: userId , adId : newAdKey}
+
+  } catch (err) {
+    console.log(err)
+  }
+
   };
   // Function to remove a user ad from Firebase
-  const removeUserAd = (adId) => {
+  const removeAd = (adId) => {
     const db = getDatabase(app);
-  // Get the owner ID (userid) from the ad
   const adRef = ref(db, `ads/${adId}`);
   get(adRef).then((adSnapshot) => {
     if (adSnapshot.exists()) {
       const ownerId = adSnapshot.val().ownerId;
-      console.log(ownerId)
-      console.log(adSnapshot.val())
-
-      // Reference to the user's myposts array
       const userMypostsRef = ref(db, `users/${ownerId}/myposts/${adId}`);
       set(userMypostsRef, null);
-
-      // Reference to the ad in the 'ads' table
       const adRef = ref(db, `ads/${adId}`);
       set(adRef, null);
     }
@@ -84,24 +72,63 @@ const addUserAd = (userId,ad) => {
     set(adRef, updatedAd);
 };
 
-const getUserAds = (userId) => {
-  const db = getDatabase(app)
-  const myAdsRef = ref(db,`users/${userId}/myAds`);
-  get(myAdsRef)
-  .then(adSnapshot => {
-      console.log(adSnapshot.val())
-  })
-  .catch(err =>{
-      console.log('error for getuseradd')
-  })
+const getUserAds = async (userId) => {
+  try{
+    const db = getDatabase(app)
+    const myAdsRef = ref(db,`users/${userId}/myAds`);
+    const response = await get(myAdsRef)
+    const userAdsIds = response.val()||{}
+    const adsIds = Object.keys(userAdsIds)
+    const userAds = adsIds.map(async adId=>{
+      const adData = await getAd(adId)
+      return {adId:adId,adData:adData}
+    })
+    return await Promise.all(userAds)
+  }
+  catch(err){
+  }
 };
 
+const existsInUserAds= async (userId,adId)=>{
+  try{
+    const db = getDatabase(app)
+    const myAdsRef = ref(db,`users/${userId}/myAds`);
+    const response = await get(myAdsRef)
+    const userAdsIds = response.val()||{}
+    const adsIds = Object.keys(userAdsIds)
+    const result =  adsIds.includes(adId)
+    return result
+  }
+  catch(err){
+  }
+
+}
+
+
+
+const DeleteUserAds =async(userId,adIds)=>{
+  try {
+    const db = getDatabase(app)
+    const result = adIds.map(async adId=>{
+      const userAdRef = ref(db,`users/${userId}/myAds/${adId}`)
+      const adRef = ref(db,`ads/${adId}`)
+      await remove(userAdRef)
+      await remove(adRef)
+    })
+    Promise.all(result)
+
+
+  } catch (err) {
+    throw err
+  }
+
+}
 const getAllAds = async () => {
   try {
     const db = getDatabase(app);
     const adsRef = ref(db, 'ads');
     const result = await get(adsRef);
-    return result.val();
+    return result.val()||{}
   } catch (err) {
     console.log(err); // You may want to return an appropriate value in case of an error
   }
@@ -138,14 +165,35 @@ const getAd = async (adId) => {
     throw err
   }
 };
+const uploadImages = async(images,adId)=>{
+try {
+  console.log(images)
+  await Promise.all(
+    images.map(async (image_uri) => {
+      const response = await fetch(image_uri);
+      const blob = await response.blob();
+      const storage = getStorage(app)
+      console.log('adding image',adId)
+      const storageRef = sref(storage, `images/${adId}/${new Date().getTime()}.jpg`);
+      await uploadBytes(storageRef, blob);
+      const uploadedRef = sref(storage,`images/${adId}/`)
+      const result = await listAll(uploadedRef);
+      console.log('getting uplaoded images',await getDownloadURL(result.items[0]))
 
+    })
+  );
+
+} catch (err) {
+  throw err
+}
+}
   const getCoverImage = async (adId) => {
     try {
       const storage = getStorage(app);
       const coverImgRef = sref(storage, `images/${adId}`);
       const result = await list(coverImgRef);
-      const downloadURL = await getDownloadURL(result.items[0]);
-      return downloadURL;
+      const downloadURL = await getDownloadURL(result.items[0])
+      return downloadURL||'';
     } catch (err) {
       throw err
     }
@@ -263,7 +311,7 @@ const getChatInteractionHistory=async(chatInteractionId)=>{
     const db = getDatabase(app)
     const chatInteractionRef = ref(db,`chatInteraction/${chatInteractionId}`)
     const response = await get(chatInteractionRef)
-    const chats = response.val()
+    const chats = response.val()||[]
     return chats
   }
   catch(err){
@@ -278,7 +326,7 @@ const getAdsInteractedWith= async (userId) => {
     const db = getDatabase(app);
     const chatHistoryRef = ref(db, `users/${userId}/chatInteraction/`);
     const response = await get(chatHistoryRef)
-    const chatHistory = response.val()
+    const chatHistory = response.val()||{}
     const keys = Object.keys(chatHistory)
     const array = keys.map(async chatInteractionId=>{
       const adId =chatHistory[chatInteractionId].adId
@@ -297,7 +345,7 @@ const getAdInteractionId =async(userId,adId)=>{
     const db = getDatabase(app);
     const chatHistoryRef = ref(db, `users/${userId}/chatInteraction/`);
     const response = await get(chatHistoryRef)
-    const chatHistory = response.val()
+    const chatHistory = response.val()||{}
     const keys = Object.keys(chatHistory)
     let foundChatInteractionId = ''
     const promise = keys.map(async chatInteractionId=>{
@@ -322,7 +370,6 @@ const sendMessage = async (adId,userId,message)=>{
     const userChatInteractionRef = ref(db, `users/${userId}/chatInteraction/`);
     const response = await get(userChatInteractionRef);
     const chatInteraction = response.val() || {};
-    console.log(chatInteraction);
     const chatInteractionIds = Object.keys(chatInteraction);
 
     let existsInChatInteraction = false;
@@ -331,7 +378,6 @@ const sendMessage = async (adId,userId,message)=>{
       const item = chatInteraction[chatInteractionId];
 
       if (item.adId === adId) {
-        console.log('h');
         existsInChatInteraction = true;
 
         const chatInteractionRef = ref(db, `chatInteraction/${chatInteractionId}/`);
@@ -349,8 +395,6 @@ const sendMessage = async (adId,userId,message)=>{
       const adResponse = await get(adRef)
       const ad = adResponse.val()
       const ownerId = ad.ownerId
-      console.log(ownerId)
-      console.log(userId)
       const chatInteractionRef =  ref(db,'chatInteraction/')
       const response = await push(chatInteractionRef,[{message:message,senderId: userId}])
       const chatInteractionId = response.key
@@ -365,17 +409,29 @@ const sendMessage = async (adId,userId,message)=>{
   }
 }
   // Function to remove a user from messaging
-  const removeFromMessaging = (senderId, receiverId) => {
-    const db = app.database();
-    const messagesRef = db.ref(`messages`);
-
-    messagesRef.remove(); // This will remove the entire conversation, be careful with this operation.
+  const deleteAdInteractions = async (userId, adIds) => {
+   try {
+     const db = getDatabase(app);
+     const result = adIds.map(async adId=>{
+      const adInteractionId = await getAdInteractionId(userId,adId)
+      const chatInteractionRef = ref(db,`chatInteraction/${adInteractionId}`)
+      const userChatInteractionRef = ref(db,`users/${userId}/chatInteraction/${adInteractionId}`)
+      await remove(chatInteractionRef)
+      await remove(userChatInteractionRef)
+     })
+    await Promise.all(result)
+   } catch (err) {
+    throw err
+   }
   };
 
   export {
+    getUserInfo,
     addUserAd,
-    removeUserAd,
+    removeAd,
     getUserAds,
+    existsInUserAds,
+    DeleteUserAds,
     getAd,
     getFavoriteAds,
     addToFavorites,
@@ -384,10 +440,12 @@ const sendMessage = async (adId,userId,message)=>{
     getAllAds,
     getCategoryAds,
     getCoverImage,
+    uploadImages,
     getAllAdImages,
     getAdsInteractedWith,
     getAdChatsHistory,
     sendMessage,
     getChatInteractionHistory,
-    getAdInteractionId
+    getAdInteractionId,
+    deleteAdInteractions
   }

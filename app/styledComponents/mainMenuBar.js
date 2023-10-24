@@ -25,25 +25,31 @@ function MainMenuBar({navigation}) {
             <TouchableOpacity onPress = {()=>{navigation.navigate('Home')}}>
                 <View style = {styles.appBarItem}>
                     <Icon name="home" size={40} style={styles.icon}/>
-                    <Text>home</Text>
+                    <Text>Home</Text>
+                </View>
+            </TouchableOpacity>
+            <TouchableOpacity onPress = {()=>{navigation.navigate('MyAds')}}>
+                <View style = {styles.appBarItem}>
+                    <Icon name="book" size={40} style={styles.icon}/>
+                    <Text>My Ads</Text>
                 </View>
             </TouchableOpacity>
             <TouchableOpacity onPress = {()=>{navigation.navigate('Post')}}>
                 <View style = {styles.appBarItem}>
                     <Icon name="pencil" size={40} style={styles.icon}/>
-                    <Text>post</Text>
+                    <Text>Post</Text>
                 </View>
             </TouchableOpacity>
             <TouchableOpacity onPress = {()=>{navigation.navigate('Favorites')}}>
                 <View style = {styles.appBarItem}>
                     <Icon name="heart" size={35} style={styles.icon}/>
-                    <Text>favorites</Text>
+                    <Text>Favorites</Text>
                 </View>
             </TouchableOpacity>
             <TouchableOpacity onPress = {()=>{navigation.navigate('Message')}}>
                 <View style = {styles.appBarItem}>
                     <Icon name="envelope" size={40} style={styles.icon}/>
-                    <Text>messages</Text>
+                    <Text>Messages</Text>
                 </View>
             </TouchableOpacity>
         </View>
