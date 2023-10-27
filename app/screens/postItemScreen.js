@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import {Button, Text, TextInput, useTheme,Checkbox, Modal, Portal,List,Divider} from 'react-native-paper'
+import {Button, Text, TextInput, useTheme,Checkbox, Modal, Portal,List,Divider, ActivityIndicator} from 'react-native-paper'
 import {View,StyleSheet,Image, TouchableOpacity,ScrollView} from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MainMenuBar from '../styledComponents/mainMenuBar';
@@ -42,6 +42,7 @@ function PostItem({navigation}) {
   const handleModalDismiss = ()=>{setModalVisibility(false)}
   const handleModalVisible = ()=>{setModalVisibility(true)}
   const [imageUrls,setImageUrls] = useState([])
+  const [loading, setLoading] = useState(false)
   const [ad,setAd] = useState({
     title: '',
     price: '',
@@ -68,6 +69,7 @@ function PostItem({navigation}) {
   const handlePostAd = async () => {
     console.log(ad)
     try {
+      setLoading(true)
       const ownerId = userId.userId
       console.log(ad)
       const adModel = createAd({ownerId: ownerId,title: ad.title,price: ad.price,description: ad.description,location:ad.location,category: ad.category})
@@ -106,7 +108,11 @@ function PostItem({navigation}) {
       borderColor: 'black',
       zIndex: 1
     },
-
+    loadingIcon:{
+      position: 'absolute',
+      top: '50%',
+      left: '50%'
+    },
     categoriesDropdown:{
       position: 'absolute',
       backgroundColor: theme.colors.background,
@@ -187,6 +193,12 @@ function PostItem({navigation}) {
   return <>
   <ScrollView>
   <View style ={styles.parentContainer}>
+  {loading&&<ActivityIndicator
+              animating={true}
+              size = {40}
+              style = {styles.loadingIcon}
+              color={theme.colors.background} />
+              }
           <View
           style = {styles.firstRow}
           >
@@ -317,14 +329,14 @@ function PostItem({navigation}) {
             mode="filled"
             onPress={()=>{handlePostAd()}}
             style={styles.button}
-
+            disabled = {loading}
             >
               Post Ad
             </Button>
           </View>
         </View>
         </ScrollView>
-        <MainMenuBar/>
+        <MainMenuBar navigation={navigation}/>
         </>
 }
 

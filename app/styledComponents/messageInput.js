@@ -3,7 +3,7 @@ import { View, TextInput, Button } from 'react-native';
 import { sendMessage } from '../screens/data/dbOperations';
 import { useSelector, useDispatch } from 'react-redux';
 
-const SellerMessageWithInput = ({ adId}) => {
+const SellerMessageWithInput = ({ adId,disabled}) => {
   const [inputMessage, setInputMessage] = useState('');
   const user = useSelector(state=>state.user)
   const dispatch = useDispatch()
@@ -26,7 +26,7 @@ const SellerMessageWithInput = ({ adId}) => {
         value={inputMessage}
         onChangeText={(text) => setInputMessage(text)}
       />
-      <Button title="Send" onPress={handleSendMessage} />
+      <Button disabled = {disabled} title="Send" onPress={handleSendMessage} />
     </View>
   );
 };

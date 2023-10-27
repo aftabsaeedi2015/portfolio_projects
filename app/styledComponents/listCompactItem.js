@@ -14,10 +14,12 @@ function ListCompactItem({navigation,item,fetchRefreshedData}) {
         item: {
             padding: 10,
             backgroundColor: 'white',
-            width: 120
+            width: 120,
+            height:200,
+            justifyContent: 'space-between'
         },
         itemImage: {
-            height: 100
+            height: 100,
         },
         blackIcon: {
             color: 'black'
@@ -94,7 +96,10 @@ function ListCompactItem({navigation,item,fetchRefreshedData}) {
 
 
   return <>
-    <TouchableOpacity  onPress = {()=>{navigation.navigate('ItemDescription',{ item: item })}}>
+    <TouchableOpacity  onPress = {()=>{
+      navigation.navigate('ItemDescription',{ item: item })
+      dispatch({type: 'changeInData'})
+      }}>
         <Card style={styles.item}>
             <Card.Cover source={{uri : downloadUrl}} style={styles.itemImage}/>
             <Card.Content>

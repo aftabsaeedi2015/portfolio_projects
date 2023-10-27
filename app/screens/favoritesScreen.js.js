@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Text } from 'react-native-paper';
+import { Button, Text,ActivityIndicator, useTheme } from 'react-native-paper';
 import { View, StyleSheet,ScrollView } from 'react-native';
 import MainMenuBar from '../styledComponents/mainMenuBar';
 import { useSelector } from 'react-redux';
@@ -7,17 +7,17 @@ import { getFavoriteAds } from './data/dbOperations';
 import FavoritesListItem from '../styledComponents/favoritesListItem';
 
 function FavoritesScreen({ navigation }) {
-  console.log('favorites')
+  const theme = useTheme()
   const [favorites, setFavorites] = useState([]);
   const user = useSelector((state) => state.user);
   const userId = user.userId;
   const changeInData = user.changeInData
+  const [loading, setLoading] = useState(true)
   const styles = StyleSheet.create({
     mainContainer: {
       flex: 1,
       display: 'flex',
       justifyContent: 'space-between',
-      padding: 10,
     },
     itemContainer: {
       display: 'flex',
@@ -37,6 +37,17 @@ function FavoritesScreen({ navigation }) {
       gap: 10,
       justifyContent: 'flex-start',
   },
+  loadingIcon:{
+    position: 'absolute',
+    top: '50%',
+    left: '50%'
+  },
+  noAdsMessage:{
+    position: 'absolute',
+    top: 300,
+    left: 60
+
+  }
   });
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -44,6 +55,7 @@ function FavoritesScreen({ navigation }) {
         const result = await getFavoriteAds(userId)
         console.log(result)
         setFavorites(result)
+        setLoading(false)
       } catch (err) {
         console.log(err);
       }
@@ -54,10 +66,16 @@ function FavoritesScreen({ navigation }) {
     console.log(favorites)
   }
   return  <View style={styles.mainContainer}>
+          {loading&&<ActivityIndicator
+                      animating={true}
+                      size = {40}
+                      style = {styles.loadingIcon}
+                      color={theme.colors.background} />
+                    }
             <ScrollView contentContainerStyle = {styles.itemContainer}>
               <View style={styles.itemRow}>
             {
-              favorites.map((item, index) => (
+              !loading && favorites.map((item, index) => (
                 <FavoritesListItem
                   key={index}
                   navigation={navigation}
@@ -65,15 +83,9 @@ function FavoritesScreen({ navigation }) {
                 />
               ))
             }
+            {favorites.length===0 && !loading && <Text style = {styles.noAdsMessage}>you have not added any ad to you favorite</Text>}
             </View>
             </ScrollView>
-            <Button
-            mode='contained'
-            onPress={()=>handleClick()}
-
-            >
-              hello
-            </Button>
             <MainMenuBar navigation={navigation} />
           </View>
 }

@@ -4,10 +4,11 @@ import ResultListItem from '../styledComponents/resultListItem'
 import MessageInput from '../styledComponents/messageInput'
 import {ChatBubble} from '../styledComponents/sellerBuyerMessage'
 import { useRoute } from '@react-navigation/native';
-import { useSelector, UseSelector } from 'react-redux'
+import { useDispatch, useSelector, UseSelector } from 'react-redux'
 import { deleteAdInteractions, getAdChatsHistory, getAdInteractionId, getChatInteractionHistory, getUserInfo, sendMessage } from './data/dbOperations'
-import { Button, useTheme } from 'react-native-paper'
+import { Button, useTheme,ActivityIndicator } from 'react-native-paper'
 import { async } from '@firebase/util'
+import {dispatch} from 'react-redux'
 
 
 
@@ -16,32 +17,41 @@ import { async } from '@firebase/util'
 function SellerBuyerInteractionScreen({navigation}) {
     const theme = useTheme()
     const route = useRoute()
+    const dispatch = useDispatch()
     const {adId,adData} = route.params
     const user = useSelector(state=>state.user)
     const userId = user.userId
     const changeInData = user.changeInData
     const [chats, setChats] = useState([])
+    const [loading, setLoading] = useState(false)
+    const [showRestartInteractionMessage,setShowRestartInteractionMessage] = useState(false)
     const [foundInteractionId,setFoundInteractionId] = useState('')
-      useEffect(() => {
-        const fetchAdChatHistory= async () => {
-          try{
-            const foundInteractionId = await getAdInteractionId(userId,adId)
-            setFoundInteractionId(foundInteractionId)
-            const response = await getChatInteractionHistory(foundInteractionId)
-            setChats(response)
-          }
-          catch(err){
-            console.log(err)
-          }
+    const fetchAdChatHistory= async () => {
+      try{
+        const foundInteractionId = await getAdInteractionId(userId,adId)
+        setFoundInteractionId(foundInteractionId)
+        const response = await getChatInteractionHistory(foundInteractionId)
+        console.log(response)
+        if(response.length===0){
+          setShowRestartInteractionMessage(true)
         }
+        setChats(response)
+      }
+      catch(err){
+        console.log(err)
+      }
+    }
+      useEffect(() => {
         fetchAdChatHistory()
-      }, []);
+      }, [chats]);
       const handleRestartChatInteraction = async() => {
+        setLoading(true)
         const userInfo = await getUserInfo(userId)
         const name = userInfo.name
         const message = `${name} has restarted the conversation`
         await sendMessage(adId,userId,message)
-        // dispatch({type: 'changeInData'})
+        fetchAdChatHistory()
+        setLoading(false)
           // Clear the input field
       };
       const deleteTheCurrentChatInteractionAndStartANewOne=async()=>{
@@ -52,6 +62,7 @@ function SellerBuyerInteractionScreen({navigation}) {
         parentContainer:{
             gap: 20,
             justifyContent: 'flex-end',
+            flex: 1
         },
         messagesContainer:{
           height: 450
@@ -63,16 +74,27 @@ function SellerBuyerInteractionScreen({navigation}) {
           marginRight: 20,
           marginTop: 20
       },
+      loadingIcon:{
+        position: 'absolute',
+        top: '50%',
+        left: '50%'
+      },
     })
   return (
     <View style={styles.parentContainer}>
+      {loading&& <ActivityIndicator
+                    animating={true}
+                    size = {40}
+                    style = {styles.loadingIcon}
+                    color={theme.colors.background} />
+              }
   <ResultListItem navigation={navigation} key ={adId} item ={{adId:adId,adData:adData}}/>
   {/* {adChatHistory.map((chat, index) => {
     return  <BuyerMessage key={index} message={chat.message} />
   })} */}
   <ScrollView style = {styles.messagesContainer}>
     {/* if user has interacted with the ad but there are no chats it means the other user has delete the chatinteraction */}
-  {(foundInteractionId!='' && chats.length===0)?
+  {showRestartInteractionMessage &&
   <>
   <Text>user has deleted this interaction</Text>
   <Button
@@ -85,14 +107,14 @@ function SellerBuyerInteractionScreen({navigation}) {
     >
         start a new conversation
   </Button>
-        </>:
-  chats.map(chat=>{
+        </>}
+  {!showRestartInteractionMessage && chats.map(chat=>{
     const senderId = chat.senderId
     const myMessage = senderId===userId
     return <ChatBubble key={Math.random()} message={chat.message} isSent={myMessage}/>
   })}
   </ScrollView>
-  <MessageInput adId = {adId}/>
+  <MessageInput adId = {adId} disabled = {loading}/>
 </View>
   )
 }

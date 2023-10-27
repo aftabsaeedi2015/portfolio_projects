@@ -112,8 +112,10 @@ const DeleteUserAds =async(userId,adIds)=>{
     const result = adIds.map(async adId=>{
       const userAdRef = ref(db,`users/${userId}/myAds/${adId}`)
       const adRef = ref(db,`ads/${adId}`)
+      // const chatInteractionRef = ref(db,`chatInteraction/${adId}`)
       await remove(userAdRef)
       await remove(adRef)
+      // await remove(chatInteractionRef)
     })
     Promise.all(result)
 
@@ -214,7 +216,51 @@ try {
     }
   };
 
+const getSuggestedAdsByTitle= async (title)=>{
+  try {
+    const db = getDatabase(app)
+    const adsRef = ref(db,'ads')
+    const response = await get(adsRef)
+    const ads = response.val()||[]
+    const adsId = Object.keys(ads)
+    const suggestedAds = adsId.reduce((result, adId) => {
+      const adTitle = ads[adId].title;
+      if (adTitle.includes(title)) {
+        result.push(adTitle);
+      }
+      return result;
+    }, []);
+    return suggestedAds
 
+  } catch (err) {
+    throw err
+  }
+}
+const getAdsMatchingSearchQuery=async(searchQuery)=>{
+  try {
+      const db = getDatabase(app)
+      const adsRef = ref(db,'ads')
+      const response = await get(adsRef)
+      const ads = response.val()||[]
+      const adsId = Object.keys(ads)
+      const searchQueryWithoutSpaces = searchQuery.replace(" ","")
+      const foundMatchingAds = []
+      adsId.forEach(adId=>{
+        const title = ads[adId].title
+        const titleWithoutSpaces = title.replace(" ","")
+        if(titleWithoutSpaces.toLowerCase().includes(searchQueryWithoutSpaces.toLowerCase())){
+          foundMatchingAds.push({adId:adId,adData:ads[adId]})
+        }
+      })
+      return foundMatchingAds
+
+
+
+  } catch (err) {
+    throw err
+  }
+
+}
 
   const getFavoriteAds = async (userId) => {
     try {
@@ -227,10 +273,11 @@ try {
       // Use map to create an array of promises
       const fetchPromises = favoriteAdsIds.map(async (adId) => {
         let foundAd = await getAd(adId);
-        favoriteAdsArray.push({ adId: adId, adData: foundAd });
-      });
+        if(foundAd){
+          favoriteAdsArray.push({ adId: adId, adData: foundAd });
+        }
 
-      // Wait for all promises to resolve using Promise.all
+      });
       await Promise.all(fetchPromises);
 
       return favoriteAdsArray;
@@ -328,13 +375,19 @@ const getAdsInteractedWith= async (userId) => {
     const response = await get(chatHistoryRef)
     const chatHistory = response.val()||{}
     const keys = Object.keys(chatHistory)
+    const adsInteractedWith = []
     const array = keys.map(async chatInteractionId=>{
       const adId =chatHistory[chatInteractionId].adId
       const ad = await getAd(adId)
-      return {adId:adId,adData: ad}
+      if(ad){
+        console.log(ad)
+        adsInteractedWith.push({adId:adId,adData: ad})
+      }
+
     })
-    const adsInteractedWith = await Promise.all(array)
+    await Promise.all(array)
     return adsInteractedWith
+
   }
   catch(err){
     throw err
@@ -442,6 +495,8 @@ const sendMessage = async (adId,userId,message)=>{
     getCoverImage,
     uploadImages,
     getAllAdImages,
+    getSuggestedAdsByTitle,
+    getAdsMatchingSearchQuery,
     getAdsInteractedWith,
     getAdChatsHistory,
     sendMessage,

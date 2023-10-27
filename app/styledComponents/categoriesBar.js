@@ -13,15 +13,17 @@ const styles =StyleSheet.create({
         width: '100%',
         justifyContent: 'space-evenly',
         alignItems: 'flex-end',
-        padding: 10
+        padding: 10,
     },
     categoryItem: {
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
     },
+    icon:{
+    }
     })
-function ItemCategoriesBar({navigation}) {
+function CategoriesBar({navigation}) {
     const categories = [
         {
             icon: 'mobile',
@@ -41,7 +43,7 @@ function ItemCategoriesBar({navigation}) {
         },
     ]
     const handleCategorySelection = async (category) => {
-          navigation.navigate('SearchResult', { category: category });
+          navigation.navigate('CategoryResult', { category: category });
     }
   return (
     <View style = {styles.categoriesContainer}>
@@ -58,4 +60,4 @@ function ItemCategoriesBar({navigation}) {
   )
 }
 
-export default ItemCategoriesBar
+export default CategoriesBar

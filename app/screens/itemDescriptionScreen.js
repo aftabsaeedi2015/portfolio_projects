@@ -7,6 +7,7 @@ import ListCompactItem from '../styledComponents/listCompactItem';
 import { useRoute } from '@react-navigation/native';
 import { existsInUserAds, getAdInteractionId, getCategoryAds } from './data/dbOperations';
 import { useSelector, UseSelector } from 'react-redux';
+import { useFocusEffect } from '@react-navigation/native';
 
 const styles = StyleSheet.create({
   parentContainer: {
@@ -92,10 +93,11 @@ function ItemDescription({navigation}) {
   const handleMessaging=()=>{
     navigation.navigate('SellerBuyerInteractionScreen',{adId: item.adId,adData: item.adData })
   }
-  useEffect(() => {
+  useEffect(()=>{
     const fetchData = async () => {
       try {
         const response = await existsInUserAds(userId,item.adId)
+        console.log(response)
         setAdExistsInUserAds(response)
         const result = await getCategoryAds(item.adData.category);
         setSimilarAds(result);
@@ -103,10 +105,9 @@ function ItemDescription({navigation}) {
         console.log(err);
       }
     };
+    fetchData()
 
-    fetchData();
-  }, [changeInData]);
-
+  },[changeInData])
 
   const similarItems = [
     {

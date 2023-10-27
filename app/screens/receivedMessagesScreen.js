@@ -1,17 +1,20 @@
 import React,{useState,useEffect} from 'react'
-import { Text,Button,useTheme } from 'react-native-paper'
+import { Text,Button,useTheme,ActivityIndicator } from 'react-native-paper'
 import MessageListItem from '../styledComponents/MessageListItem'
-import {useSelector} from 'react-redux'
+import {useSelector,useDispatch} from 'react-redux'
 import { deleteAdInteractions, getAdsInteractedWith, getSendOrReceivedMessages } from './data/dbOperations'
 import {View,StyleSheet} from 'react-native'
+import MainMenuBar from '../styledComponents/mainMenuBar'
 
 function ReceivedMessagesScreen({navigation}) {
   const theme = useTheme()
   const user = useSelector(state=>state.user)
+  const dispatch = useDispatch()
   const userId = user.userId
   const changeInData = user.changeInData
   const [chatHistory,setChatHistory] = useState([])
   const [selectedAdInteractions,setSelectedAdInteractions] = useState([])
+  const [loading, setLoading] = useState(true)
   const addToSelectedAdInteractions =(adId,status)=>{
       if(status && !selectedAdInteractions.includes(adId)){
           setSelectedAdInteractions([...selectedAdInteractions,adId])
@@ -24,17 +27,20 @@ function ReceivedMessagesScreen({navigation}) {
   const deleteSelectedAdInteraction = async () => {
     try{
         const result = await deleteAdInteractions(userId,selectedAdInteractions)
-        // dispatch({type: 'changeInData'})
+        dispatch({type: 'changeInData'})
     }
     catch(err){
         console.log(err)
     }
 }
   useEffect(()=>{
+    setLoading(true)
     const fetchUserChatHistory = async () => {
       try{
         const adsInteractedWith = await getAdsInteractedWith(userId)
+        console.log(adsInteractedWith)
         setChatHistory(adsInteractedWith)
+        setLoading(false)
       }
       catch(err){
         console.log(err)
@@ -44,6 +50,12 @@ function ReceivedMessagesScreen({navigation}) {
   },[changeInData])
 
   const styles = StyleSheet.create({
+    parentContainer:{
+      flex: 1,
+      justifyContent: 'space-between',
+      gap: 10,
+      alignItems: 'center'
+    },
     deleteButton:{
       alignSelf: 'flex-end',
       backgroundColor: theme.colors.background,
@@ -51,10 +63,24 @@ function ReceivedMessagesScreen({navigation}) {
       marginRight: 20,
       marginTop: 20
   },
+  messagesContainer: {
+    flex: 1
+  },
+  loadingIcon:{
+    position: 'absolute',
+    top: '50%',
+    left: '50%'
+  },
 
   })
   return (
-    <View>
+    <View style = {styles.parentContainer}>
+      {loading&&<ActivityIndicator
+                      animating={true}
+                      size = {40}
+                      style = {styles.loadingIcon}
+                      color={theme.colors.background} />
+                    }
       <Button
         style = {styles.deleteButton}
         mode='contained'
@@ -66,9 +92,13 @@ function ReceivedMessagesScreen({navigation}) {
         >
             delete
         </Button>
-    {chatHistory.map(ad=>{
-      return <MessageListItem navigation={navigation} ad={ad} addToSelectedAdInteractions={addToSelectedAdInteractions}/>
-    })}
+        <View style = {styles.messagesContainer}>
+        {chatHistory.map(ad=>{
+          return <MessageListItem navigation={navigation} ad={ad} addToSelectedAdInteractions={addToSelectedAdInteractions}/>
+        })}
+        {chatHistory.length===0 && !loading && <Text style = {styles.noAdsMessage}>no interaction to view</Text>}
+      </View>
+    <MainMenuBar navigation={navigation}/>
     </View>
   )
 }

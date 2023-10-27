@@ -1,19 +1,20 @@
 import React,{useState,useEffect} from 'react'
-import {useTheme,ActivityIndicator} from 'react-native-paper'
+// import data from '../screens/data/data'
+import {Card, Text,Snackbar,useTheme,ActivityIndicator} from 'react-native-paper'
 import { View,StyleSheet} from 'react-native'
 import ResultListItem from '../styledComponents/resultListItem'
 import {useRoute} from '@react-navigation/native'
-import {getAdsMatchingSearchQuery } from './data/dbOperations'
+import { addToFavorites, getCategoryAds } from './data/dbOperations'
 import MainMenuBar from '../styledComponents/mainMenuBar'
-import {useSelector} from 'react-redux'
+import {useSelector,useDispatch} from 'react-redux'
 
 
 
 
-function SearchResultScreen({navigation}) {
+function CategoryResult({search_query,navigation}) {
   const theme = useTheme()
-  const route = useRoute()
-  const {searchQuery} = route.params
+  const route = useRoute();
+  const { category } = route.params;
   const [ads,setAds] = useState([])
   const user = useSelector(state=>state.user)
   const userId = user.userI
@@ -35,8 +36,8 @@ function SearchResultScreen({navigation}) {
   useEffect( ()=>{
     const fetchAdsforCategory = async ()=>{
       try {
-        const response = await getAdsMatchingSearchQuery(searchQuery)
-        setAds(response)
+        const result = await getCategoryAds(category);
+        setAds(result)
         setLoading(false)
       } catch (err) {
         console.log(err);
@@ -46,17 +47,17 @@ function SearchResultScreen({navigation}) {
 },[changeInData])
   return <View style = {styles.parentContainer}>
           {loading&&<ActivityIndicator
-                      animating={true}
-                      size = {40}
-                      style = {styles.loadingIcon}
-                      color={theme.colors.background} />
-                    }
+                          animating={true}
+                          size = {40}
+                          style = {styles.loadingIcon}
+                          color={theme.colors.background} />
+              }
           <View>
-          {ads.map((ad,index)=>{
+          {!loading && ads.map((item,index)=>{
             return <ResultListItem
             key = {index}
             navigation={navigation}
-            item = {ad}
+            item = {item}
             />
           })}
             </View>
@@ -69,4 +70,4 @@ function SearchResultScreen({navigation}) {
 
 }
 
-export default SearchResultScreen
+export default CategoryResult

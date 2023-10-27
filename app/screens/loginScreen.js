@@ -1,6 +1,6 @@
 import React, { useState } from  'react';
-import { View, StyleSheet } from 'react-native';
-import { TextInput,Button,Card,useTheme,Text,HelperText} from 'react-native-paper';
+import { View, StyleSheet,Image } from 'react-native';
+import { TextInput,Button,Card,useTheme,Text,HelperText,ActivityIndicator} from 'react-native-paper';
 import {app,auth} from '../../firebase'
 import {signInWithEmailAndPassword} from 'firebase/auth';
 import { addUserAd,removeUserAd,getUserAds,getAd,addToFavorites,removeFromFavorites } from './data/dbOperations';
@@ -14,23 +14,28 @@ const LoginScreen = ({navigation}) => {
   const [password, setPassword] = useState('');
   const dispatch = useDispatch()
   const selector = useSelector(state=> state.user)
-
+  const [loading, setLoading] = useState(false)
   const handleLogin = async () => {
     try {
+
       const response = await signInWithEmailAndPassword(auth,email, password);
+      setLoading(true)
       const user = response.user
       const user_id = user.uid
       dispatch({type: 'setUserId',payload: user_id})
       console.log(selector)
       // removeUserAd('-NgfyKbkWgLSheEfP_8R')
-      
+
       // getUserAds('H6GW5h0J2AfQ3DODVNHujNtRYSg2')
       // getAd('-Ngg0KixCEo-FCAQuwuI')
       // addToFavorites('H6GW5h0J2AfQ3DODVNHujNtRYSg2','adidd')
       // removeFromFavorites('H6GW5h0J2AfQ3DODVNHujNtRYSg2','adid')
-      navigation.navigate('Home');
+      setTimeout(() => {
+        navigation.navigate('Home');
+      }, 1000);
     } catch (error) {
       setIncorrectCredentials(true);
+      setLoading(false)
       console.log(error)
     }
   };
@@ -45,6 +50,26 @@ const LoginScreen = ({navigation}) => {
       gap: 40,
 
     },
+    backgroundImage:{
+      flex: 1,
+      resizeMode: 'cover',
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      zIndex: -1
+  },
+  loadingIcon:{
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    zIndex: 2
+  },
+  loadingText:{
+    position: 'absolute',
+    top: '40%',
+    left: '40%',
+    fontSize: 30
+  },
     title: {
       fontSize: 25,
       color: 'white',
@@ -90,7 +115,20 @@ const LoginScreen = ({navigation}) => {
 
   return (
       <View style={styles.container}>
-        <Card style={styles.card}>
+        {loading&&<>
+        <Text style = {styles.loadingText}>loggin in...</Text>
+        <ActivityIndicator
+          animating={true}
+          size = {40}
+          style = {styles.loadingIcon}
+          color={theme.colors.background} />
+          </>
+      }
+        <Image
+            source={require('../assets/splashScreenBackground.jpg')}
+            style={styles.backgroundImage}
+          />
+        {!loading&&<Card style={styles.card}>
         <Card.Title
          title="Please Login"
          titleStyle={styles.title}
@@ -131,7 +169,7 @@ const LoginScreen = ({navigation}) => {
               >Register</Button>
             </View>
           </Card.Content>
-        </Card>
+        </Card>}
       </View>
   );
 };
