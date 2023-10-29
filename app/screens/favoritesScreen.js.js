@@ -44,8 +44,8 @@ function FavoritesScreen({ navigation }) {
   },
   noAdsMessage:{
     position: 'absolute',
-    top: 300,
-    left: 60
+    top: 30,
+    left: 140
 
   }
   });

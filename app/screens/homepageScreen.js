@@ -102,7 +102,6 @@ function HomepageScreen({navigation}) {
                     item = {ad}/>
                 })
                 }
-
             </View>
         </ScrollView>
 

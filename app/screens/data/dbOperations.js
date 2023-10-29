@@ -415,12 +415,33 @@ const getAdInteractionId =async(userId,adId)=>{
   }
 
 }
+// when user1 wants to restart interaction with user2 then we simply add the chatinteractionid to the users table
+const restartInteractionForUser = async(chatInteractionId,userWhoRestartsInteraction,UserToRestartInteractionWith,adId)=>{
+  try {
+    const db = getDatabase(app);
+    const userChatInteractionRef = ref(db, `users/${UserToRestartInteractionWith}/chatInteraction/${chatInteractionId}/`)
+    const chatInteractionRef = ref(db, `chatInteraction/${chatInteractionId}/`);
+    const chatInteractionResponse = await get(chatInteractionRef);
+    const previousData = chatInteractionResponse.val() || [];
+    const userInf = await getUserInfo(userWhoRestartsInteraction)
+    const message = `${userInf.name} has restarted the conversation`
+    const updatedData = [...previousData, { message: message, senderId: userWhoRestartsInteraction }];
+    await set(chatInteractionRef, updatedData);
+    await set(userChatInteractionRef,{adId:adId})
 
-const sendMessage = async (adId,userId,message)=>{
+  } catch (err) {
+    throw err
+  }
+
+}
+// when sending the message we check if the there has been an interaction already between the two users,
+// if yes then we simply add the message to the chatInteraction/interactionId if it is the first time two users
+// are interacting then we add both the ids of the two users which we can use to restart an interaction
+const sendMessage = async (adId,senderId,message)=>{
   try{
     // first check if the ad exists in the interactionHistory
     const db = getDatabase(app);
-    const userChatInteractionRef = ref(db, `users/${userId}/chatInteraction/`);
+    const userChatInteractionRef = ref(db, `users/${senderId}/chatInteraction/`);
     const response = await get(userChatInteractionRef);
     const chatInteraction = response.val() || {};
     const chatInteractionIds = Object.keys(chatInteraction);
@@ -436,22 +457,23 @@ const sendMessage = async (adId,userId,message)=>{
         const chatInteractionRef = ref(db, `chatInteraction/${chatInteractionId}/`);
         const chatInteractionResponse = await get(chatInteractionRef);
         const previousData = chatInteractionResponse.val() || [];
-        const updatedData = [...previousData, { message: message, senderId: userId }];
+        const updatedData = [...previousData, { message: message, senderId: senderId }];
 
         await set(chatInteractionRef, updatedData);
       }
     }
 
     // add the chatinteractionid to owner and user when first time interacted
+    // because the buyers are the ones who initiate the conversation
     if(!existsInChatInteraction){
       const adRef = ref(db,`ads/${adId}`)
       const adResponse = await get(adRef)
       const ad = adResponse.val()
       const ownerId = ad.ownerId
       const chatInteractionRef =  ref(db,'chatInteraction/')
-      const response = await push(chatInteractionRef,[{message:message,senderId: userId}])
+      const response = await push(chatInteractionRef,[{sellerId:ownerId,buyerId: senderId},{message:message,senderId: senderId}])
       const chatInteractionId = response.key
-      const userChatInteractionRef = ref(db, `users/${userId}/chatInteraction/${chatInteractionId}/`)
+      const userChatInteractionRef = ref(db, `users/${senderId}/chatInteraction/${chatInteractionId}/`)
       const ownerChatInteractionRef = ref(db, `users/${ownerId}/chatInteraction/${chatInteractionId}/`)
       await set(userChatInteractionRef,{adId:adId})
       await set(ownerChatInteractionRef,{adId:adId})
@@ -461,15 +483,26 @@ const sendMessage = async (adId,userId,message)=>{
     throw err
   }
 }
-  // Function to remove a user from messaging
+//when deleting chatInteractions we check if only one user is deleting the interaction if yes then we delete the chatInteraction
+//from the user chatInteraction and set the interaction in the chatinteraction table to contain only the ids of the seller and the buyer
+// so that we can use it in case we want  to restart an interaction if both users are trying to delete the interaction then we delete it from the chatInteraction table
   const deleteAdInteractions = async (userId, adIds) => {
    try {
      const db = getDatabase(app);
      const result = adIds.map(async adId=>{
       const adInteractionId = await getAdInteractionId(userId,adId)
       const chatInteractionRef = ref(db,`chatInteraction/${adInteractionId}`)
+      const interactionRef = await get(chatInteractionRef)
+      const response = interactionRef.val()||[]
+      if(response.length==1){
+        await remove(chatInteractionRef)
+        console.log('both users deleting the interaction')
+      }
+      else{
+        await set(chatInteractionRef,[response[0]])
+        console.log('current user deleting the conversation')
+      }
       const userChatInteractionRef = ref(db,`users/${userId}/chatInteraction/${adInteractionId}`)
-      await remove(chatInteractionRef)
       await remove(userChatInteractionRef)
      })
     await Promise.all(result)
@@ -499,6 +532,7 @@ const sendMessage = async (adId,userId,message)=>{
     getAdsMatchingSearchQuery,
     getAdsInteractedWith,
     getAdChatsHistory,
+    restartInteractionForUser,
     sendMessage,
     getChatInteractionHistory,
     getAdInteractionId,

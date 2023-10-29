@@ -1,6 +1,6 @@
 import React,{useState,useEffect} from 'react'
 import {useTheme,ActivityIndicator} from 'react-native-paper'
-import { View,StyleSheet} from 'react-native'
+import { View,StyleSheet,Text} from 'react-native'
 import ResultListItem from '../styledComponents/resultListItem'
 import {useRoute} from '@react-navigation/native'
 import {getAdsMatchingSearchQuery } from './data/dbOperations'
@@ -24,13 +24,19 @@ function SearchResultScreen({navigation}) {
       display: 'flex',
       flex: 1,
       flexDirection: 'column',
-      justifyContent: 'space-between'
+      justifyContent: 'space-between',
     },
     loadingIcon:{
       position: 'absolute',
       top: '50%',
       left: '50%'
     },
+    noResultTextContainer:{
+      position: 'absolute',
+      top: '50%',
+      left: '45%',
+
+    }
   })
   useEffect( ()=>{
     const fetchAdsforCategory = async ()=>{
@@ -59,6 +65,10 @@ function SearchResultScreen({navigation}) {
             item = {ad}
             />
           })}
+          {ads.length===0 && <Text style = {styles.noResultTextContainer}>
+            no ads found
+          </Text>
+            }
             </View>
             <View>
               <MainMenuBar navigation={navigation}/>

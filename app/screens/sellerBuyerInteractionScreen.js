@@ -5,14 +5,10 @@ import MessageInput from '../styledComponents/messageInput'
 import {ChatBubble} from '../styledComponents/sellerBuyerMessage'
 import { useRoute } from '@react-navigation/native';
 import { useDispatch, useSelector, UseSelector } from 'react-redux'
-import { deleteAdInteractions, getAdChatsHistory, getAdInteractionId, getChatInteractionHistory, getUserInfo, sendMessage } from './data/dbOperations'
+import { deleteAdInteractions, existsInUserAds, getAd, getAdChatsHistory, getAdInteractionId, getChatInteractionHistory, getUserInfo, restartInteractionForUser, sendMessage } from './data/dbOperations'
 import { Button, useTheme,ActivityIndicator } from 'react-native-paper'
 import { async } from '@firebase/util'
 import {dispatch} from 'react-redux'
-
-
-
-
 
 function SellerBuyerInteractionScreen({navigation}) {
     const theme = useTheme()
@@ -21,21 +17,39 @@ function SellerBuyerInteractionScreen({navigation}) {
     const {adId,adData} = route.params
     const user = useSelector(state=>state.user)
     const userId = user.userId
-    const changeInData = user.changeInData
+    const changeIntData = user.changeIntData
     const [chats, setChats] = useState([])
     const [loading, setLoading] = useState(false)
     const [showRestartInteractionMessage,setShowRestartInteractionMessage] = useState(false)
     const [foundInteractionId,setFoundInteractionId] = useState('')
+    const handleSendMessage = async(inputMessage) => {
+      const NotfirstTimeInteraction = inputMessage.trim() !== '' && chats.length>0
+      if (NotfirstTimeInteraction){
+        await sendMessage(adId,userId,inputMessage)
+        dispatch({type: 'changeInData'})
+
+      }
+      else if(!NotfirstTimeInteraction){
+        await sendMessage(adId,userId,inputMessage)
+        dispatch({type: 'changeInData'})
+
+      }
+      fetchAdChatHistory()
+    };
     const fetchAdChatHistory= async () => {
       try{
         const foundInteractionId = await getAdInteractionId(userId,adId)
         setFoundInteractionId(foundInteractionId)
         const response = await getChatInteractionHistory(foundInteractionId)
-        console.log(response)
+        console.log('chats',response)
         if(response.length===0){
           setShowRestartInteractionMessage(true)
         }
+        else{
+          setShowRestartInteractionMessage(false)
+        }
         setChats(response)
+        dispatch({type: 'changeInData'})
       }
       catch(err){
         console.log(err)
@@ -43,19 +57,22 @@ function SellerBuyerInteractionScreen({navigation}) {
     }
       useEffect(() => {
         fetchAdChatHistory()
-      }, [chats]);
+        console.log('useeffect running again ')
+      }, [,chats,changeIntData]);
       const handleRestartChatInteraction = async() => {
         setLoading(true)
-        const userInfo = await getUserInfo(userId)
-        const name = userInfo.name
-        const message = `${name} has restarted the conversation`
-        await sendMessage(adId,userId,message)
+        // we have to check if the current user is the owner cause we can then specify which user to restart the conversation with seller or buyer from chats array
+        if(userId === adData.ownerId){
+          // chatInteractionId,userWhoRestartsInteraction,UserToRestartInteractionWith,adId
+          await restartInteractionForUser(foundInteractionId,userId,chats[0].buyerId,adId)
+        }
+        else{
+          await restartInteractionForUser(foundInteractionId,userId,chats[0].sellerId,adId)
+        }
         fetchAdChatHistory()
         setLoading(false)
-          // Clear the input field
       };
       const deleteTheCurrentChatInteractionAndStartANewOne=async()=>{
-        await deleteAdInteractions(userId,[adId])
         await handleRestartChatInteraction()
       }
       const styles = StyleSheet.create({
@@ -94,7 +111,7 @@ function SellerBuyerInteractionScreen({navigation}) {
   })} */}
   <ScrollView style = {styles.messagesContainer}>
     {/* if user has interacted with the ad but there are no chats it means the other user has delete the chatinteraction */}
-  {showRestartInteractionMessage &&
+  {chats.length===1 &&
   <>
   <Text>user has deleted this interaction</Text>
   <Button
@@ -108,13 +125,15 @@ function SellerBuyerInteractionScreen({navigation}) {
         start a new conversation
   </Button>
         </>}
-  {!showRestartInteractionMessage && chats.map(chat=>{
+  {!showRestartInteractionMessage && chats.slice([1]).map(chat=>{
+    console.log('insidemap function')
+
     const senderId = chat.senderId
-    const myMessage = senderId===userId
-    return <ChatBubble key={Math.random()} message={chat.message} isSent={myMessage}/>
+    const isSent = senderId===userId
+    return <ChatBubble key={Math.random()} message={chat.message} isSent={isSent}/>
   })}
   </ScrollView>
-  <MessageInput adId = {adId} disabled = {loading}/>
+  <MessageInput adId = {adId} disabled = {loading} handleSendMessage = {handleSendMessage}/>
 </View>
   )
 }

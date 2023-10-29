@@ -54,17 +54,20 @@ function PostItem({navigation}) {
   const storage = getStorage(app);
   var counter = 0
   const selectImage = async () => {
-    let results = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      aspect: [4, 3],
-      quality: 0.2,
-      allowsMultipleSelection: true
-    });
-    if (!results.canceled) {
-      const image_uri = results.assets[0].uri
+    if(!loading){
+      let results = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        aspect: [4, 3],
+        quality: 0.2,
+        allowsMultipleSelection: true
+      });
+      if (!results.canceled) {
+        const image_uri = results.assets[0].uri
 
-      setImageUrls([...imageUrls,image_uri])
+        setImageUrls([...imageUrls,image_uri])
+      }
     }
+
   };
   const handlePostAd = async () => {
     console.log(ad)
@@ -287,6 +290,7 @@ function PostItem({navigation}) {
             size = {50}
             style={styles.plusIcon}
             onPress = {selectImage}
+            disabled = {loading}
             />
             <View style = {styles.imagesContainer}>
               <Portal
