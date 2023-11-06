@@ -1,13 +1,13 @@
 const CreateMessage = (postid, message, type) => {
-    return {
-        postid: postid,
-        messages: [
-            {
-                message: message,
-                type: type
-            }
-        ]
-    };
+  return {
+    postid: postid,
+    messages: [
+      {
+        message: message,
+        type: type,
+      },
+    ],
+  };
 };
 
 // const adsInteractions = [
@@ -19,26 +19,32 @@ const CreateMessage = (postid, message, type) => {
 //     {chatInteractionId: chatInteractionId,adId:adId}
 // ]
 
-const createAd = ({ownerId, title, price, description, location, category}) => {
-    return {
-        ownerId: ownerId,
-        title: title,
-        price: price,
-        description: description,
-        location: location,
-        category: category
-    };
+const createAd = ({
+  ownerId,
+  title,
+  price,
+  description,
+  location,
+  category,
+}) => {
+  return {
+    ownerId: ownerId,
+    title: title,
+    price: price,
+    description: description,
+    location: location,
+    category: category,
+  };
 };
-const createUser = ({ name, phone, email}) => {
-    return {
-        name: name,
-        phone: phone,
-        email: email,
-        favorites: [],
-        messageHistory: [],
-        myAds: []
-    };
+const createUser = ({ name, phone, email }) => {
+  return {
+    name: name,
+    phone: phone,
+    email: email,
+    favorites: [],
+    messageHistory: [],
+    myAds: [],
+  };
 };
 
-export {CreateMessage,createAd,createUser};
-
+export { CreateMessage, createAd, createUser };

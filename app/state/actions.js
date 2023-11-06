@@ -1,5 +1,5 @@
-const getData =()=>{
-    return {
-        type: 'getData'
-    }
-}
+const getData = () => {
+  return {
+    type: "getData",
+  };
+};

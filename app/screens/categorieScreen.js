@@ -1,9 +1,7 @@
-import React from 'react'
+import React from "react";
 
 function CategorieScreen() {
-  return (
-    <div>CategorieScreen</div>
-  )
+  return <div>CategorieScreen</div>;
 }
 
-export default CategorieScreen
+export default CategorieScreen;

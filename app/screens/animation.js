@@ -1,5 +1,5 @@
-import { Button, View } from 'react-native';
-import Animated, { useSharedValue, withTiming } from 'react-native-reanimated';
+import { Button, View } from "react-native";
+import Animated, { useSharedValue, withTiming } from "react-native-reanimated";
 
 export default function Animation() {
   const width = useSharedValue(100);
@@ -9,12 +9,12 @@ export default function Animation() {
   };
 
   return (
-    <View style={{ flex: 1, alignItems: 'center' }}>
+    <View style={{ flex: 1, alignItems: "center" }}>
       <Animated.View
         style={{
           width,
           height: 100,
-          backgroundColor: 'violet',
+          backgroundColor: "violet",
         }}
       />
       <Button onPress={handlePress} title="Click me" />

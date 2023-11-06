@@ -1,18 +1,21 @@
-import React from 'react';
-import { View, Text ,StyleSheet} from 'react-native';
-import { Avatar, Card, Paragraph } from 'react-native-paper';
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { Avatar, Card, Paragraph } from "react-native-paper";
 
-const ChatBubble = ({ key,message, isSent, profilePic }) => {
+const ChatBubble = ({ key, message, isSent, profilePic }) => {
   return (
     <Card
-    key = {key}
+      key={key}
       style={[
         styles.chatBubble,
         isSent ? styles.sentBubble : styles.receivedBubble,
       ]}
     >
       <Card.Content style={styles.cardContent}>
-        <Avatar.Image size={40} source={profilePic ? { uri: profilePic } : null} />
+        <Avatar.Image
+          size={40}
+          source={profilePic ? { uri: profilePic } : null}
+        />
         <Text style={styles.messageText}>{message}</Text>
       </Card.Content>
     </Card>
@@ -23,20 +26,20 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   chatBubble: {
-    maxWidth: '70%',
-    alignSelf: 'flex-end',
+    maxWidth: "70%",
+    alignSelf: "flex-end",
     marginVertical: 8,
   },
   sentBubble: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#007BFF',
+    alignSelf: "flex-start",
+    backgroundColor: "#007BFF",
   },
   receivedBubble: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
   },
   cardContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   messageText: {
     marginLeft: 10,
