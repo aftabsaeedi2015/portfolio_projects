@@ -8,7 +8,6 @@ function SearchBar({ navigation }) {
   const theme = useTheme();
   const [isFocused, setIsFocused] = useState(false);
   const handleSearch = () => {
-    console.log(searchQuery);
   };
   const [searchQuery, setSearchQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -17,7 +16,6 @@ function SearchBar({ navigation }) {
     const fetchSuggestedAds = async () => {
       try {
         const suggestedAds = await getSuggestedAdsByTitle(searchQuery);
-        console.log(suggestedAds);
         setSuggestedAdsByTitle(suggestedAds);
       } catch (err) {
         console.log(err);
@@ -95,7 +93,6 @@ function SearchBar({ navigation }) {
       {showSuggestions && searchQuery != "" && (
         <View style={styles.suggestedAdsDropdown}>
           {suggestedAdsByTitle.map((title, index) => {
-            console.log(title);
             return (
               <>
                 <List.Item

@@ -26,7 +26,7 @@ function ResultListItem({ navigation, item }) {
     parentContainer: {
       display: "flex",
       flexDirection: "row",
-      padding: 10,
+      padding: 5,
       backgroundColor:theme.colors.secondary,
       borderRadius: 5,
       marginTop: 4
@@ -38,6 +38,7 @@ function ResultListItem({ navigation, item }) {
     image: {
       height: 100,
       width: 100,
+      borderRadius: 5
     },
     descriptionContainer: {
       alignItems: "flex-start",

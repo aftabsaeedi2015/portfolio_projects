@@ -17,7 +17,6 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 
 function FavoritesListItem({ navigation, key, item }) {
-  console.log(item);
   const theme = useTheme();
   const styles = StyleSheet.create({
     parentContainer: {

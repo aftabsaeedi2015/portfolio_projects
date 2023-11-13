@@ -53,7 +53,6 @@ function FavoritesScreen({ navigation }) {
     const fetchFavorites = async () => {
       try {
         const result = await getFavoriteAds(userId);
-        console.log(result);
         setFavorites(result);
         setLoading(false);
       } catch (err) {
@@ -62,9 +61,6 @@ function FavoritesScreen({ navigation }) {
     };
     fetchFavorites();
   }, [changeInData]);
-  const handleClick = () => {
-    console.log(favorites);
-  };
   return (
     <SafeAreaView style={styles.mainContainer}>
       {loading && (

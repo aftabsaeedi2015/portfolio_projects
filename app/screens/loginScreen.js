@@ -36,13 +36,6 @@ const LoginScreen = ({ navigation }) => {
       const user = response.user;
       const user_id = user.uid;
       dispatch({ type: "setUserId", payload: user_id });
-      console.log(selector);
-      // removeUserAd('-NgfyKbkWgLSheEfP_8R')
-
-      // getUserAds('H6GW5h0J2AfQ3DODVNHujNtRYSg2')
-      // getAd('-Ngg0KixCEo-FCAQuwuI')
-      // addToFavorites('H6GW5h0J2AfQ3DODVNHujNtRYSg2','adidd')
-      // removeFromFavorites('H6GW5h0J2AfQ3DODVNHujNtRYSg2','adid')
       setTimeout(() => {
         navigation.navigate("Home");
       }, 1000);

@@ -47,13 +47,13 @@ function ListCompactItem({ navigation, item, fetchRefreshedData }) {
     },
     snackbar: {
       position: "absolute",
-      backgroundColor: theme.colors.accent,
+      backgroundColor: theme.colors.secondary,
       top: 120,
       width: "100%",
       borderRadius: '50%'
     },
     snackbarText: {
-      color: theme.colors.accentText,
+      color: theme.colors.text,
     },
   });
   const opacity = useSharedValue(20)

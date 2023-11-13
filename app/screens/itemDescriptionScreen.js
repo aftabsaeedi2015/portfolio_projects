@@ -11,16 +11,17 @@ import {
 import Icon from "react-native-vector-icons/FontAwesome";
 // import {MapView,Marker} from 'react-native-maps';
 import ListCompactItem from "../styledComponents/listCompactItem";
-import { useRoute } from "@react-navigation/native";
+import { useRoute,useFocusEffect } from "@react-navigation/native";
 import {
   existsInUserAds,
   getAdInteractionId,
   getCategoryAds,
+  getImages,
   getUserInfo,
 } from "./data/dbOperations";
 import { useSelector, UseSelector } from "react-redux";
-import { useFocusEffect } from "@react-navigation/native";
 import MainMenuBar from "../styledComponents/mainMenuBar";
+import ImageSlider from "../styledComponents/imageSlider";
 
 
 
@@ -34,6 +35,7 @@ function ItemDescription({ navigation }) {
   const [owner, setOwner] = useState({});
   const [similarAds, setSimilarAds] = useState([]);
   const [adExistsInUserAds, setAdExistsInUserAds] = useState(true);
+  const [images,setImages] = useState([])
   const [loading, setLoading] = useState(true);
   const handleMessaging = () => {
     navigation.navigate("SellerBuyerInteractionScreen", {
@@ -125,6 +127,7 @@ function ItemDescription({ navigation }) {
       position: "absolute",
       top: "50%",
       left: "50%",
+      zIndex: 1
     },
     text:{
       color: theme.colors.text,
@@ -141,23 +144,29 @@ function ItemDescription({ navigation }) {
 
     }
   });
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await existsInUserAds(userId, item.adId);
-        console.log(response);
-        setAdExistsInUserAds(response);
-        const result = await getCategoryAds(item.adData.category);
-        setSimilarAds(result);
-        const ownerResponse = await getUserInfo(item.adData.ownerId);
-        setOwner(ownerResponse);
-        setLoading(false)
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchData();
-  }, [changeInData]);
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        try {
+          const fetchedImages = await getImages(item.adId);
+          setImages(fetchedImages)
+
+          const response = await existsInUserAds(userId, item.adId);
+          setAdExistsInUserAds(response);
+          const result = await getCategoryAds(item.adData.category);
+          setSimilarAds(result);
+          const ownerResponse = await getUserInfo(item.adData.ownerId);
+          setOwner(ownerResponse);
+          setLoading(false);
+        } catch (err) {
+          console.log(err);
+        }
+      };
+      setLoading(true)
+      fetchData();
+
+    }, [changeInData])
+  );
 
   return (
     <SafeAreaView style={styles.parentContainer}>
@@ -166,16 +175,17 @@ function ItemDescription({ navigation }) {
             animating={true}
             size={40}
             style={styles.loadingIcon}
-            color={theme.colors.background}
+            color={theme.colors.accent}
           />
         )}
       <ScrollView
         style={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.imageContainer}>
-          <Image source={require("../assets/phone.jpg")} style={styles.image} />
-        </View>
+        {/* <View style={styles.imageContainer}>
+          <Image source={{uri : images[0]}} style={styles.image} />
+        </View> */}
+        <ImageSlider images = {images}/>
         <View>
           <Text style={styles.text}>{item.adData.title}</Text>
         </View>
@@ -190,6 +200,7 @@ function ItemDescription({ navigation }) {
           onPress={() => {
             navigation.navigate("Profile", { ownerId: item.adData.ownerId,ownerName: owner.name });
           }}
+          disabled = {loading}
         >
           <View style={styles.profileDetails}>
             <Image

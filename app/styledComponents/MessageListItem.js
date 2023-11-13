@@ -54,7 +54,6 @@ function MessageListItem({ navigation, ad, addToSelectedAdInteractions }) {
     const fetchAdData = async () => {
       try {
         const url = await getCoverImage(adId);
-        console.log(url)
         setimageUrl(url);
       } catch (err) {
         console.log(err);

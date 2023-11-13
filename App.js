@@ -27,6 +27,7 @@ import Animation from "./app/screens/animation";
 import ProfileScreen from "./app/screens/profileScreen";
 import SignupScreen from "./app/screens/signupScreen";
 import MainMenuBar from "./app/styledComponents/mainMenuBar";
+import ImageSlider from "./app/styledComponents/imageSlider";
 
 export default function App() {
   const [isDarkMode, setIsDarkMode] = React.useState(true);
@@ -47,7 +48,7 @@ export default function App() {
   const Stack = createNativeStackNavigator();
   const headerStyle = {
     headerStyle: {
-      backgroundColor: theme.colors.background, // Set the background color to blue
+      backgroundColor: theme.colors.secondary, // Set the background color to blue
     },
     headerTintColor: '#fff',
     headerTitleStyle: {
@@ -55,6 +56,19 @@ export default function App() {
       fontWeight: "bold", // Make the title text bold
       justifyContent: 'center'
     },
+    headerBackVisible: false
+  }
+  const headerStyle2 = {
+    headerStyle: {
+      backgroundColor: theme.colors.secondary, // Set the background color to blue
+    },
+    headerTintColor: '#fff',
+    headerTitleStyle: {
+      alignItems: "center", // Center the title
+      fontWeight: "bold", // Make the title text bold
+      justifyContent: 'center'
+    },
+    headerBackVisible: true
   }
   return (
     <Provider store={store}>
@@ -62,34 +76,39 @@ export default function App() {
         <NavigationContainer>
           <Stack.Navigator>
             {/* <Stack.Screen name="animation" component={Animation} /> */}
-
+            {/* <Stack.Screen name="Slider" component={ImageSlider}
+            options={{headerShown: false}} /> */}
             <Stack.Screen name="Splash" component={SplashScreen}
-            options={
-              {headerShown: false}
-            } />
+            options={{headerShown: false}} />
             <Stack.Screen name="Login" component={LoginScreen}
-            options={
-              {headerShown: false}
-
-            }
+            options={{headerShown: false}}
             />
-            <Stack.Screen name="Profile" component={ProfileScreen}
+            <Stack.Screen
+            name="Profile"
+            component={ProfileScreen}
+            options={headerStyle2}
              />
-            <Stack.Screen name="Signup" component={SignupScreen} />
-            <Stack.Screen name="Home" component={HomepageScreen}
+            <Stack.Screen
+            name="Signup"
+            component={SignupScreen}
+            options={headerStyle}
+            />
+            <Stack.Screen
+            name="Home"
+            component={HomepageScreen}
             options={headerStyle}
             />
             <Stack.Screen name="SearchResult" component={SearchResultScreen}
-            options = {headerStyle}
+            options = {headerStyle2}
             />
             <Stack.Screen name="MyAds" component={MyAdsScreen}
              options = {headerStyle}
             />
             <Stack.Screen name="CategoryResult" component={CategoryResult}
-             options = {headerStyle}
+             options = {headerStyle2}
             />
             <Stack.Screen name="ItemDescription" component={ItemDescription}
-             options = {headerStyle}
+             options = {headerStyle2}
             />
             <Stack.Screen name="Post" component={PostItem}
              options = {headerStyle}
@@ -104,7 +123,7 @@ export default function App() {
              options = {headerStyle}
               />
             <Stack.Screen name="SellerBuyerInteractionScreen" component={SellerBuyerInteractionScreen}
-             options = {headerStyle}
+             options = {headerStyle2}
              />
             {/* <Stack.Screen name="AdPostSuccess" component={SuccessAdPostMessage} /> */}
           </Stack.Navigator>

@@ -53,7 +53,7 @@ const addUserAd = async (userId, ad) => {
     await set(userMypostsRef, true);
     return { userId: userId, adId: newAdKey };
   } catch (err) {
-    console.log(err);
+    throw err
   }
 };
 // Function to remove a user ad from Firebase
@@ -92,7 +92,9 @@ const getUserAds = async (userId) => {
       return { adId: adId, adData: adData };
     });
     return await Promise.all(userAds);
-  } catch (err) {}
+  } catch (err) {
+    throw err
+  }
 };
 
 const existsInUserAds = async (userId, adId) => {
@@ -104,7 +106,9 @@ const existsInUserAds = async (userId, adId) => {
     const adsIds = Object.keys(userAdsIds);
     const result = adsIds.includes(adId);
     return result;
-  } catch (err) {}
+  } catch (err) {
+    throw err
+  }
 };
 
 const DeleteUserAds = async (userId, adIds) => {
@@ -130,7 +134,7 @@ const getAllAds = async () => {
     const result = await get(adsRef);
     return result.val() || {};
   } catch (err) {
-    console.log(err); // You may want to return an appropriate value in case of an error
+    throw err
   }
 };
 const getCategoryAds = async (category) => {
@@ -149,7 +153,7 @@ const getCategoryAds = async (category) => {
     }
     return categoryArray;
   } catch (err) {
-    console.log(err);
+    throw err
   }
 };
 
@@ -167,13 +171,11 @@ const getAd = async (adId) => {
 };
 const uploadImages = async (images, adId) => {
   try {
-    console.log(images);
     await Promise.all(
       images.map(async (image_uri) => {
         const response = await fetch(image_uri);
         const blob = await response.blob();
         const storage = getStorage(app);
-        console.log("adding image", adId);
         const storageRef = sref(
           storage,
           `images/${adId}/${new Date().getTime()}.jpg`
@@ -181,10 +183,6 @@ const uploadImages = async (images, adId) => {
         await uploadBytes(storageRef, blob);
         const uploadedRef = sref(storage, `images/${adId}/`);
         const result = await listAll(uploadedRef);
-        console.log(
-          "getting uplaoded images",
-          await getDownloadURL(result.items[0])
-        );
       })
     );
   } catch (err) {
@@ -202,6 +200,20 @@ const getCoverImage = async (adId) => {
     throw err;
   }
 };
+
+const getImages = async (adId)=>{
+  try {
+    const storage = getStorage(app);
+    const coverImgRef = sref(storage, `images/${adId}`);
+    const result = await list(coverImgRef)||[];
+    const images = result.items.map(async image=>{
+      return await getDownloadURL(image)
+    })
+    return Promise.all(images)
+  } catch (err) {
+    throw err;
+  }
+}
 const getAllAdImages = async (adId) => {
   try {
     const storage = getStorage(app);
@@ -214,7 +226,7 @@ const getAllAdImages = async (adId) => {
     }
     return downloadURLs;
   } catch (err) {
-    console.log("Error listing images in the folder:", err);
+    throw err
   }
 };
 
@@ -296,9 +308,8 @@ const addToFavorites = async (userId, adId) => {
     favoritesArray.push(adId);
     await set(favoritesRef, favoritesArray);
     return "Ad added to favorites";
-  } catch (error) {
-    console.log("Error in addToFavorites:", error);
-    throw error;
+  } catch (err) {
+    throw err;
   }
 };
 
@@ -309,9 +320,8 @@ const existsInFavorites = async (userId, adId) => {
     const favoritesSnapshot = await get(favoritesRef);
     let favoritesArray = favoritesSnapshot.val() || [];
     return favoritesArray.includes(adId);
-  } catch (error) {
-    console.log("Error in addToFavorites:", error);
-    throw error;
+  } catch (err) {
+    throw err
   }
 };
 // Function to remove an ad from a user's favorites
@@ -326,9 +336,9 @@ const removeFromFavorites = async (userId, adId) => {
     favoritesArray = favoritesArray.filter((favId) => favId !== adId);
     await set(favoritesRef, favoritesArray);
     return "Ad removed from favorites.";
-  } catch (error) {
+  } catch (err) {
     // console.error('Error removing ad from favorites:', error);
-    throw error;
+    throw err;
   }
 };
 
@@ -371,7 +381,6 @@ const getAdsInteractedWith = async (userId) => {
       const adId = chatHistory[chatInteractionId].adId;
       const ad = await getAd(adId);
       if (ad) {
-        console.log(ad);
         adsInteractedWith.push({ adId: adId, adData: ad });
       }
     });
@@ -508,10 +517,8 @@ const deleteAdInteractions = async (userId, adIds) => {
       const response = interactionRef.val() || [];
       if (response.length == 1) {
         await remove(chatInteractionRef);
-        console.log("both users deleting the interaction");
       } else {
         await set(chatInteractionRef, [response[0]]);
-        console.log("current user deleting the conversation");
       }
       const userChatInteractionRef = ref(
         db,
@@ -540,6 +547,7 @@ export {
   getAllAds,
   getCategoryAds,
   getCoverImage,
+  getImages,
   uploadImages,
   getAllAdImages,
   getSuggestedAdsByTitle,

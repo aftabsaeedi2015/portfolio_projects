@@ -42,7 +42,6 @@ function ReceivedMessagesScreen({ navigation }) {
     const fetchUserChatHistory = async () => {
       try {
         const adsInteractedWith = await getAdsInteractedWith(userId);
-        console.log(adsInteractedWith);
         setChatHistory(adsInteractedWith);
         setLoading(false);
       } catch (err) {

@@ -59,12 +59,12 @@ text:{
 },
     snackbar: {
       position: "absolute",
-      backgroundColor: theme.colors.accent,
+      backgroundColor: theme.colors.secondary,
       top: 400,
       width: "100%",
     },
     snackbarText: {
-      color: theme.colors.accentText,
+      color: theme.colors.text,
     },
     checkboxContainer: {
       position: 'absolute',

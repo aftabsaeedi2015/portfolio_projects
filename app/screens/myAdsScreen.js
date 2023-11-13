@@ -32,7 +32,6 @@ function MyAdsScreen({ navigation }) {
     }
   };
   const deleteSelectedAds = async () => {
-    console.log(selectedAds);
     try {
       await DeleteUserAds(userId, selectedAds);
       dispatch({ type: "changeInData" });
@@ -125,7 +124,7 @@ function MyAdsScreen({ navigation }) {
                 />
               );
             })}
-          {myAds.length === 0 && !loading && <Text style = {{color: theme.colors.background,fontSize: 25}}>you have not posted any ad</Text>}
+          {myAds.length === 0 && !loading && <Text style = {{color: theme.colors.text,fontSize: 25}}>you have not posted any ad</Text>}
         </View>
 
       </View>

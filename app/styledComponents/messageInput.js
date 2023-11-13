@@ -15,6 +15,8 @@ const SellerMessageWithInput = ({ disabled, handleSendMessage }) => {
         flexDirection: "row",
         alignItems: "center",
         paddingHorizontal: 16,
+        marginBottom: 50
+
       }}
     >
       <TextInput

@@ -66,7 +66,7 @@ function CategoryResult({ search_query, navigation }) {
         />
       )}
       <ScrollView contentContainerStyle = {styles.listItemsContainer}>
-      {ads.length === 0 && !loading && <Text style = {{color: theme.colors.background,fontSize: 25}}>no ad found</Text>}
+      {ads.length === 0 && !loading && <Text style = {{color: theme.colors.text,fontSize: 25}}>no ad found</Text>}
         {!loading &&
           ads.map((item, index) => {
             return (

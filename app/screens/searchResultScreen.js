@@ -68,7 +68,7 @@ function SearchResultScreen({ navigation }) {
           );
         })}
         {ads.length === 0 && (
-          <Text style = {{color: theme.colors.background,fontSize: 25,marginTop: 30}}>no ads found</Text>
+          <Text style = {{color: theme.colors.text,fontSize: 25,marginTop: 30}}>no ads found</Text>
         )}
       </ScrollView>
       <View>

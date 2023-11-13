@@ -50,7 +50,6 @@ function SellerBuyerInteractionScreen({ navigation }) {
       const foundInteractionId = await getAdInteractionId(userId, adId);
       setFoundInteractionId(foundInteractionId);
       const response = await getChatInteractionHistory(foundInteractionId);
-      console.log("chats", response);
       if (response.length === 0) {
         setShowRestartInteractionMessage(true);
       } else {
@@ -64,7 +63,6 @@ function SellerBuyerInteractionScreen({ navigation }) {
   };
   useEffect(() => {
     fetchAdChatHistory();
-    console.log("useeffect running again ");
   }, [, chats, changeIntData]);
   const handleRestartChatInteraction = async () => {
     setLoading(true);
@@ -96,6 +94,8 @@ function SellerBuyerInteractionScreen({ navigation }) {
       gap: 20,
       justifyContent: "flex-end",
       flex: 1,
+      backgroundColor: theme.colors.background,
+      padding: 10
     },
     messagesContainer: {
       height: 450,
@@ -149,8 +149,6 @@ function SellerBuyerInteractionScreen({ navigation }) {
         )}
         {!showRestartInteractionMessage &&
           chats.slice([1]).map((chat) => {
-            console.log("insidemap function");
-
             const senderId = chat.senderId;
             const isSent = senderId === userId;
             return (

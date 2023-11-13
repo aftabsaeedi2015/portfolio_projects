@@ -10,6 +10,7 @@ import {
   List,
   Divider,
   ActivityIndicator,
+  HelperText,
 } from "react-native-paper";
 import {
   View,
@@ -30,7 +31,7 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 import * as ImagePicker from "expo-image-picker";
-import { useSelector } from "react-redux";
+import { useSelector,useDispatch } from "react-redux";
 import { addUserAd, uploadImages } from "../screens/data/dbOperations";
 import { createAd } from "../screens/data/dataModel";
 
@@ -59,12 +60,16 @@ function PostItem({ navigation }) {
   ];
   const [showCategories, setShowCategories] = useState(false);
   const theme = useTheme();
+  const dispatch = useDispatch()
   const [checked, setChecked] = useState(false);
   const [modalVisibility, setModalVisibility] = useState(false);
+  const [imageIndex, setImageIndex] = useState(null);
+  const [invalidInputValuesIndexes,setInvalidInputValuesIndexes] = useState([])
   const handleModalDismiss = () => {
     setModalVisibility(false);
   };
-  const handleModalVisible = () => {
+  const handleModalVisible = (index) => {
+    setImageIndex(index)
     setModalVisibility(true);
   };
   const [imageUrls, setImageUrls] = useState([]);
@@ -89,17 +94,26 @@ function PostItem({ navigation }) {
       });
       if (!results.canceled) {
         const image_uri = results.assets[0].uri;
-
         setImageUrls([...imageUrls, image_uri]);
       }
     }
   };
+  const validateValuesBeforePosting = ()=>{
+    const values = Object.values(ad)
+    const result = true
+    values.forEach(value => {
+      if(String(value).trim()==='') {
+        console.log()
+        result = false
+      }
+    })
+
+    return result
+  }
   const handlePostAd = async () => {
-    console.log(ad);
     try {
       setLoading(true);
       const ownerId = userId.userId;
-      console.log(ad);
       const adModel = createAd({
         ownerId: ownerId,
         title: ad.title,
@@ -108,12 +122,16 @@ function PostItem({ navigation }) {
         location: ad.location,
         category: ad.category,
       });
-      const adInfo = await addUserAd(ownerId, adModel);
-      console.log(adInfo);
-      const response = await uploadImages(imageUrls, adInfo.adId);
-      navigation.navigate("MyAds");
+      if(validateValuesBeforePosting(adModel) && imageUrls.length!=0){
+        const adInfo = await addUserAd(ownerId, adModel);
+        const response = await uploadImages(imageUrls, adInfo.adId);
+        dispatch({type: 'setMenuIndex',payload: 1})
+        navigation.navigate("MyAds");
+      }
+      setLoading(false)
+
     } catch (err) {
-      console.error("Error uploading images:", err);
+      console.log("Error uploading images:", err);
     }
   };
 
@@ -126,7 +144,7 @@ function PostItem({ navigation }) {
       display: "flex",
       flexDirection: "column",
       padding: 10,
-      gap: 30,
+      gap: 15,
       backgroundColor: theme.colors.background,
       paddingTop: 50
     },
@@ -146,7 +164,7 @@ function PostItem({ navigation }) {
     },
     firstRow: {
       display: "flex",
-      flexDirection: "row",
+      flexDirection: "column",
       gap: 5,
     },
     descriptionInput: {
@@ -220,6 +238,9 @@ function PostItem({ navigation }) {
       flex: 1,
       gap: 4,
     },
+    helperText: {
+      color: 'orange',
+    },
     image: {
       height: 100,
       width: 100,
@@ -227,7 +248,7 @@ function PostItem({ navigation }) {
     },
     removeImageIcon:{
       position: 'absolute',
-      color: 'red',
+      color: theme.colors.accent,
       left: 75,
       zIndex: 1
     },
@@ -284,6 +305,13 @@ function PostItem({ navigation }) {
               activeUnderlineColor = {theme.colors.accentText}
               onChangeText={(text) => setAd({ ...ad, title: text })}
             />
+             <HelperText
+              type="error"
+              visible={ad.title===''}
+              style={styles.helperText}
+            >
+              title is empty
+            </HelperText>
 
             <TextInput
               mode="flat"
@@ -293,6 +321,13 @@ function PostItem({ navigation }) {
               activeUnderlineColor = {theme.colors.accentText}
               onChangeText={(text) => setAd({ ...ad, price: text })}
             />
+            <HelperText
+              type="error"
+              visible={ad.price===''}
+              style={styles.helperText}
+            >
+              price is empty
+            </HelperText>
           </View>
           <View styles={styles.description}>
             <TextInput
@@ -304,6 +339,13 @@ function PostItem({ navigation }) {
               style={styles.descriptionInput}
               onChangeText={(text) => setAd({ ...ad, description: text })}
             />
+            <HelperText
+              type="error"
+              visible={ad.description===''}
+              style={styles.helperText}
+            >
+              description is empty
+            </HelperText>
           </View>
           <View>
             <Button
@@ -319,6 +361,13 @@ function PostItem({ navigation }) {
             >
               select category
             </Button>
+            <HelperText
+              type="error"
+              visible={ad.category===''}
+              style={styles.helperText}
+            >
+              select the category
+            </HelperText>
             {showCategories ? (
               <View style={styles.categoriesDropdown}>
                 {categories.map((category) => {
@@ -366,7 +415,15 @@ function PostItem({ navigation }) {
               onChangeText={(text) => setAd({ ...ad, location: text })}
 
             />
+
           </View>
+          <HelperText
+              type="error"
+              visible={ad.location===''}
+              style={{color: 'orange', marginTop: -10,zIndex: -1}}
+            >
+              add the address
+            </HelperText>
           <View style={styles.imageSection}>
             <Icon
               name="upload"
@@ -387,20 +444,20 @@ function PostItem({ navigation }) {
                       setModalVisibility(false);
                     }}
                   >
-                    <Icon name="close" size={50} />
+                    <Icon name="close" size={50}  color={theme.colors.accent}/>
                   </TouchableOpacity>
                   <View style={styles.modalImageContainer}>
                     <Image
                       alt="image"
-                      source={require("../assets/phone.jpg")}
+                      source={{uri : imageUrls[imageIndex]}}
                       style={styles.modalImage}
                     />
                   </View>
                 </Modal>
               </Portal>
-              {imageUrls.map((url) => {
+              {imageUrls.map((url,index) => {
                 return (
-                  <TouchableOpacity onPress={handleModalVisible} key={url}>
+                  <TouchableOpacity onPress={()=>handleModalVisible(index)} key={index}>
                     <View style = {styles.uploadedImageContainer}>
                       <TouchableOpacity onPress={()=>{
                         const updatedUploadedImageUrls = imageUrls.filter(imageUrl => imageUrl !== url);
@@ -426,6 +483,13 @@ function PostItem({ navigation }) {
               })}
             </View>
           </View>
+          <HelperText
+              type="error"
+              visible={imageUrls.length===0}
+              style={{color: 'orange', marginTop: -10,zIndex: -1}}
+            >
+              add at least one image
+            </HelperText>
           <View style={styles.buttonContainer}>
             <Button
               mode="filled"

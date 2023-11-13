@@ -21,6 +21,7 @@ function ProfileScreen({ navigation }) {
     parentContainer: {
       flex: 1,
       flexDirection: "column",
+      backgroundColor: theme.colors.background,
     },
     profilePicContainer: {
       borderBottomWidth: 1,
@@ -41,9 +42,9 @@ function ProfileScreen({ navigation }) {
       gap: 1
     },
     text:{
-      fontSize: 30,
+      fontSize: 25,
       marginLeft: 20,
-      color: theme.colors.background
+      color: theme.colors.text
     },
     loadingIcon: {
       position: "absolute",
@@ -54,7 +55,6 @@ function ProfileScreen({ navigation }) {
   useEffect(() => {
     const fetchUserAds = async () => {
       const response = await getUserAds(ownerId);
-      console.log(response);
       setMyAds(response);
       setLoading(false);
     };
@@ -75,9 +75,8 @@ function ProfileScreen({ navigation }) {
           source={require("../assets/profilePic.png")}
           style={styles.image}
         />
-        <Text style = {styles.text}>{ownerName}</Text>
       </View>
-      <Text style = {styles.text}>posted ads</Text>
+      <Text style = {styles.text}>ads posted by {ownerName}</Text>
       <ScrollView style={styles.userAdsContainer}>
         <View style={styles.adContainer}>
           {!loading &&
