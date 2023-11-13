@@ -20,7 +20,7 @@ import {
   ScrollView,
   SafeAreaView
 } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome";
+import Icon from "react-native-vector-icons/FontAwesome5";
 import MainMenuBar from "../styledComponents/mainMenuBar";
 import { app } from "../../firebase";
 import {
@@ -39,7 +39,7 @@ function PostItem({ navigation }) {
   const categories = [
     {
       title: "clothing",
-      icon: "tshirt",
+      icon: "watch",
     },
     {
       title: "electronics",

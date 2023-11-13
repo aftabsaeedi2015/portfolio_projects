@@ -25,7 +25,7 @@ import MainMenuBar from "../styledComponents/mainMenuBar";
 function HomepageScreen({ navigation }) {
   const [ads, setAds] = useState([]);
   const theme = useTheme();
-
+  
   const user = useSelector((state) => state.user);
   const changeInData = user.changeInData;
   const [loading, setLoading] = useState(true);

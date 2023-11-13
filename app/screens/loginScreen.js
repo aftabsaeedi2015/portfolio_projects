@@ -37,6 +37,7 @@ const LoginScreen = ({ navigation }) => {
       const user_id = user.uid;
       dispatch({ type: "setUserId", payload: user_id });
       setTimeout(() => {
+        dispatch({type: 'setMenuIndex',payload: 0})
         navigation.navigate("Home");
       }, 1000);
     } catch (error) {

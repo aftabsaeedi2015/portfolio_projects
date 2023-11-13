@@ -63,7 +63,8 @@ function SellerBuyerInteractionScreen({ navigation }) {
   };
   useEffect(() => {
     fetchAdChatHistory();
-  }, [, chats, changeIntData]);
+  }, [ changeIntData]);
+  // for real time interaction add the chats state to the dependency array for the useeffect
   const handleRestartChatInteraction = async () => {
     setLoading(true);
     // we have to check if the current user is the owner cause we can then specify which user to restart the conversation with seller or buyer from chats array
@@ -128,9 +129,6 @@ function SellerBuyerInteractionScreen({ navigation }) {
         key={adId}
         item={{ adId: adId, adData: adData }}
       />
-      {/* {adChatHistory.map((chat, index) => {
-    return  <BuyerMessage key={index} message={chat.message} />
-  })} */}
       <ScrollView style={styles.messagesContainer}>
         {/* if user has interacted with the ad but there are no chats it means the other user has delete the chatinteraction */}
         {chats.length === 1 && (

@@ -12,6 +12,7 @@ import ResultListItem from "../styledComponents/resultListItem";
 import { useRoute } from "@react-navigation/native";
 import { addToFavorites, getCategoryAds } from "./data/dbOperations";
 import { useSelector, useDispatch } from "react-redux";
+import MainMenuBar from "../styledComponents/mainMenuBar";
 
 function CategoryResult({ search_query, navigation }) {
   const theme = useTheme();
@@ -56,7 +57,6 @@ function CategoryResult({ search_query, navigation }) {
   }, [changeInData]);
   return (
     <SafeAreaView style={styles.parentContainer}>
-
       {loading && (
         <ActivityIndicator
           animating={true}
@@ -73,10 +73,12 @@ function CategoryResult({ search_query, navigation }) {
               <ResultListItem key={index} navigation={navigation} item={item} />
             );
           })}
+
       </ScrollView>
 
       <View>
       </View>
+      <MainMenuBar navigation={navigation} />
     </SafeAreaView>
   );
 }

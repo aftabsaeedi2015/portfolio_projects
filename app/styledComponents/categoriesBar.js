@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, useTheme } from "react-native-paper";
 import { StyleSheet, View, TouchableOpacity } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome";
+import Icon from "react-native-vector-icons/FontAwesome5";
 import { getCategoryAds } from "../screens/data/dbOperations";
 
 
@@ -41,12 +41,20 @@ function CategoriesBar({ navigation }) {
       name: "vehicles",
     },
     {
-      icon: "mobile",
+      icon: "tshirt",
       name: "clothing",
     },
     {
-      icon: "car",
-      name: "more categories",
+      icon: "book",
+      name: "books",
+    },
+    {
+      icon: "football-ball",
+      name: "fitness",
+    },
+    {
+      icon: "dog",
+      name: "pets",
     },
   ];
   const handleCategorySelection = async (category) => {
