@@ -77,11 +77,11 @@ function Membership() {
                 }
             }}
             >
-                the training sessions you can join
+                the training {classes.length>1 ? ' sessions ': ' session '} you can join
                 {classes.length>1 ? ' are ': ' is '}
                 {classes.map((c,index) =>  {
                     if(index===classes.length-1){
-                        return  ' and '+String(c.class)+` starting from ${c.start_date.slice(0,10)}. `
+                        return  String(c.class)+` starting from ${c.start_date.slice(0,10)}. `
                         }
                     else return String(c.class)+` starting from ${c.start_date.slice(0,10)}, `})}
             </Typography>

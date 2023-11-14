@@ -84,6 +84,16 @@ app.post('/login',async (req,res)=>{
       res.json(err)
     }
 })
+app.post('/signup',async (req,res)=>{
+  try{
+    console.log(req.body)
+    const result = await dbOperations.signup_user(req.body)
+    res.json(result)
+  }
+  catch(err){
+    res.json(err)
+  }
+})
 
 app.get('/posts' , async (req,res) => {
   try{

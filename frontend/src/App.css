@@ -1,16 +1,22 @@
 .App {
   text-align: center;
   overflow: hidden;
+
 }
 body{
   /* overflow: hidden; */
 }
+
+::-webkit-scrollbar {
+  display: none;
+}
+
 .line{
   position: absolute;
   top: 11%;
   left: -5%;
   height: 100px;
-  width: 110%;
+  width: 100%;
   transform: rotateZ(0.5deg);
 }
 .runningman{

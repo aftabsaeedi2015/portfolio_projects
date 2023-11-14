@@ -4,6 +4,10 @@ import {motion} from 'framer-motion'
 import { makeStyles,ThemeProvider } from '@mui/styles';
 import {useTheme} from '@mui/material/styles'
 import theme from '../../theme';
+import profile1 from '../../../assets/staff.jpg'
+import profile2 from '../../../assets/staff1.jpg'
+import profile3 from '../../../assets/staff2.jpg'
+import profile4 from '../../../assets/staff3.jpg'
 
 
 
@@ -29,10 +33,10 @@ const createstyle = makeStyles((theme) => ({
 function AboutPage() {
     const classes = createstyle(theme)
     const trainers = [
-        {id: 1, name: 'aftab', class: 'boxing', description: '2 years of experience in boxing',image: 'image'},
-        {id: 2, name: 'aftab', class: 'boxing', description: '2 years of experience in boxing',image: 'image'},
-        {id: 3, name: 'aftab', class: 'boxing', description: '2 years of experience in boxing',image: 'image'},
-        {id: 4, name: 'aftab', class: 'boxing', description: '2 years of experience in boxing',image: 'image'},
+        {id: 1, name: 'christina', class: 'boxing', description: '2 years of experience in boxing',image: profile1},
+        {id: 2, name: 'ashley', class: 'boxing', description: '2 years of experience in boxing',image: profile2},
+        {id: 3, name: 'charlie', class: 'boxing', description: '2 years of experience in boxing',image: profile3},
+        {id: 4, name: 'nina', class: 'boxing', description: '2 years of experience in boxing',image: profile4},
     ]
     const aboutus = {
       'our story':
@@ -106,8 +110,8 @@ function AboutPage() {
                return <Card sx={{ minWidth: '300px' }} className={classes.card} variant="outlined">
                         <CardMedia
                             component="img"
-                            height="140"
-                            image="la;ksd;f"
+                            height="150"
+                            image={trainer.image}
                             alt="image"
                         />
                         <CardContent>

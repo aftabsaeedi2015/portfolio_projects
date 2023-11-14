@@ -36,7 +36,7 @@ function Contactus() {
     <ThemeProvider theme = {theme}>
         <motion.div
             className={classes.container}
-            initial={{ y: 300,opacity: 0 }}
+            initial={{ y: 200,opacity: 0 }}
             transition={{ duration: 0.5 }}
             whileInView={{ y: 0, opacity: 1 }}
             style={{

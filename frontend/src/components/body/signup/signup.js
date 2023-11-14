@@ -19,10 +19,10 @@ import { makeStyles, propsToClassKey } from '@mui/styles';
 import { useTheme } from '@mui/material/styles';
 import StyledButton from '../../styledComponents/styledButton';
 import {motion} from 'framer-motion'
+import axios from 'axios'
 
 
 
-// TODO remove, this demo shouldn't need to reset the theme.
 const createStyles = makeStyles((theme) => ({
     formContainer: {
         background: 'rgba(0,0,0,0.5)',
@@ -40,15 +40,15 @@ const createStyles = makeStyles((theme) => ({
     },
     checkbox: {
         '&.Mui-checked': {
-            color: 'black',       // Color of the checkbox background when checked
+            color: 'black',
             '& .MuiSvgIcon-root': {
-              fill: 'white',      // Color of the checkmark symbol when checked
+              fill: 'white',
             },
           },
     },
     customFocused: {
         '& .css-1ff8729-MuiInputBase-root-MuiFilledInput-root:after': {
-          borderBottom: '2px solid white', // Change this to your desired color
+          borderBottom: '2px solid white',
         },
       },
     alreadyRegistered: {
@@ -93,8 +93,27 @@ export default function SignUp() {
         }
   }
   if (!empty_info) {
+    console.log(userInfo)
+    const userData = {
+      username:userInfo.email,
+      password: userInfo.password,
+      name: userInfo.firstName+" "+userInfo.lastName,
+    classes: [],
+    plan: {},
+    is_admin: false
+    }
+    axios.post('http://localhost:4000/signup',userData)
+    .then(response=>{
+      if(Object.keys(response.data).length != 0){
+        console.log('signup successfull')
+    }
+    else{
+      console.log('unsuccessfull signup')
+    }
+  })
+  .catch(err=>console.log(err.message))
     setSnackbarOpen(true);
-    navigate('/login')
+    navigate('/')
   }
 }
 

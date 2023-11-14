@@ -34,6 +34,21 @@ async function get_user_info(id) {
     return err.message;
   }
 }
+
+async function signup_user(user_info){
+  try {
+    console.log('dboperations')
+    console.log(user_info)
+    const user = new User(user_info)
+    await user.save()
+    return user
+  } catch (err) {
+    return err.message
+
+  }
+
+}
+
 async function login_user(credentials){
     const result = await User.find(credentials)
     return result
@@ -79,5 +94,6 @@ module.exports = {
   buy_plan,
   get_user_info,
   get_all_posts,
-  get_post
+  get_post,
+  signup_user
 };
